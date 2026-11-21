@@ -1,0 +1,36 @@
+
+
+i want to build a portfolio webstie to post on github and i want to include some of the websties i have done so far and i want them 
+to be seen it will have all details of a modern cv and areas for education skills  hobbies among other things. provide the template skeleton for this create subfolders for this 
+so that i can suggest what i want to be included in my site i will list my socials as we proceed emails 
+
+
+in github i have the reposiroty https://github.com/Hawer-tow/My-Portfolio-
+i want everythin in this workspace to be pushed to it so that after some time we can push the new 
+update code files so we maintain our code in an event of loss or damage to the machine.
+
+i hit my session limit kindly proceed from where we stopped. 
+i lost my internet connection kindly proceed
+
+npm run dev
+npm run build
+npm run preview
+
+
+echo "# My-Portfolio-" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Hawer-tow/My-Portfolio-.git
+git push -u origin main
+
+
+git remote add origin https://github.com/Hawer-tow/My-Portfolio-.git
+git branch -M main
+git push -u origin main
+
+
+
+
+

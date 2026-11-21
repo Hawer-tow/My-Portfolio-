@@ -1,0 +1,53 @@
+---
+/** A home-page section: anchored, labelled by its heading, with an optional intro line. */
+interface Props {
+  id: string;
+  title: string;
+  intro?: string;
+  class?: string;
+}
+
+const { id, title, intro, class: className } = Astro.props;
+---
+
+<section id={id} class:list={['section', className]} aria-labelledby={`${id}-title`}>
+  <div class="container">
+    <header class="section__header" data-reveal>
+      <h2 id={`${id}-title`} class="section__title">
+        {title}
+      </h2>
+      {intro && <p class="section__intro">{intro}</p>}
+    </header>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+    border-top: 1px solid var(--border);
+  }
+
+  .section__header {
+    max-width: var(--measure);
+    margin-bottom: var(--space-l);
+  }
+
+  .section__title::before {
+    content: '';
+    display: block;
+    width: 2.5rem;
+    height: 2px;
+    margin-bottom: var(--space-s);
+    background: var(--accent);
+  }
+
+  .section__title {
+    margin-bottom: var(--space-2xs);
+  }
+
+  .section__intro {
+    margin: 0;
+    color: var(--text-muted);
+  }
+</style>

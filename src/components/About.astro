@@ -1,0 +1,101 @@
+---
+import { site } from '../config/site';
+import { profile } from '../data/profile';
+import Section from './Section.astro';
+
+const facts = [
+  { label: 'Location', value: site.location },
+  { label: 'Degree', value: site.degreeName },
+  { label: 'University', value: site.universityName },
+  { label: 'Languages', value: site.languages.join(', ') },
+];
+---
+
+<Section id="about" title="About">
+  <div class="about">
+    <div class="prose about__text" data-reveal>
+      {profile.about.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+
+      {site.features.showInterests && (
+        <section class="interests" aria-labelledby="interests-title">
+          <h3 id="interests-title" class="interests__title">
+            Outside work
+          </h3>
+          <p>{profile.interests.intro}</p>
+          <ul class="tag-list" aria-label="Interests">
+            {profile.interests.items.map((item) => (
+              <li>
+                <span class="tag interests__tag">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+    <dl class="about__facts card" data-reveal>
+      {facts.map((fact) => (
+        <div class="about__fact">
+          <dt>{fact.label}</dt>
+          <dd>{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</Section>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    align-items: start;
+  }
+
+  .about__facts {
+    display: grid;
+    gap: var(--space-s);
+    padding: var(--space-m);
+  }
+
+  .about__facts:hover {
+    box-shadow: none;
+  }
+
+  .about__fact dt {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .about__fact dd {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .interests {
+    margin-top: var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--border);
+  }
+
+  .interests__title {
+    margin-bottom: var(--space-2xs);
+    font-size: var(--step-1);
+  }
+
+  /* Interests read as words, not code: plain text face instead of mono. */
+  .interests__tag {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+  }
+
+  @media (min-width: 60rem) {
+    .about {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      gap: var(--space-2xl);
+    }
+  }
+</style>

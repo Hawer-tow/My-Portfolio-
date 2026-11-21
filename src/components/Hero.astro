@@ -1,0 +1,145 @@
+---
+import { Picture } from 'astro:assets';
+import { site } from '../config/site';
+import { profile } from '../data/profile';
+import { resolveImage } from '../lib/images';
+import { withBase } from '../lib/url';
+import Icon from './Icon.astro';
+
+// {{PROFILE_PHOTO}}: the placeholder is a neutral monogram. "Your photo here" appears only in its alt text.
+const photo = await resolveImage(site.profilePhoto);
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__media">
+      <Picture
+        src={photo}
+        alt={site.profilePhotoAlt}
+        formats={['avif', 'webp']}
+        widths={[176, 264, 352, 528]}
+        sizes="(min-width: 48rem) 264px, 176px"
+        loading="eager"
+        fetchpriority="high"
+        class="hero__photo"
+      />
+    </div>
+
+    <div class="hero__text">
+      <p class="eyebrow">Hello, I’m {site.shortName}</p>
+      <h1 id="hero-title" class="hero__name">
+        {site.fullName}
+      </h1>
+      <p class="hero__role">{site.roleTitle}</p>
+      <p class="hero__summary">{profile.heroSummary}</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#projects">
+          View projects
+        </a>
+        <a class="btn btn--secondary" href={withBase(site.cvPdfPath)} download>
+          <Icon name="download" />
+          Download CV
+        </a>
+        <a class="hero__contact link-arrow" href="#contact">
+          Get in touch
+          <Icon name="arrow-right" size={16} />
+        </a>
+      </div>
+
+      {site.features.showAvailability && (
+        <p class="hero__availability">
+          <span class="hero__dot" aria-hidden="true"></span>
+          {profile.availability}
+        </p>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 8vw, 6rem) clamp(3rem, 8vw, 5.5rem);
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    align-items: center;
+  }
+
+  .hero__media {
+    justify-self: start;
+  }
+
+  .hero :global(.hero__photo) {
+    width: 176px;
+    height: 176px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    object-fit: cover;
+  }
+
+  .hero__name {
+    margin-bottom: var(--space-2xs);
+    font-size: var(--step-5);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  .hero__role {
+    margin-bottom: var(--space-m);
+    font-size: var(--step-1);
+    color: var(--text-muted);
+  }
+
+  .hero__summary {
+    max-width: 60ch;
+    margin-bottom: var(--space-l);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-s);
+  }
+
+  .hero__contact {
+    min-height: 2.75rem;
+    padding-inline: var(--space-3xs);
+  }
+
+  .hero__availability {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6em;
+    margin: var(--space-l) 0 0;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .hero__dot {
+    flex: none;
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-tint);
+    transform: translateY(-0.05em);
+  }
+
+  @media (min-width: 48rem) {
+    .hero__inner {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--space-2xl);
+    }
+
+    .hero :global(.hero__photo) {
+      width: 264px;
+      height: 264px;
+    }
+  }
+</style>

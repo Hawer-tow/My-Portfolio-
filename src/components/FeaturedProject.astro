@@ -1,0 +1,137 @@
+---
+import { Picture } from 'astro:assets';
+import { site } from '../config/site';
+import { isFilled } from '../lib/placeholders';
+import { projectHref, type Project } from '../lib/projects';
+import Icon from './Icon.astro';
+import TagList from './TagList.astro';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+const href = projectHref(project);
+
+// The live site, when there is one; the source (and, without a live site, a demo) is on request.
+const hasLiveSite = isFilled(data.links.demo);
+const requestLabel = hasLiveSite ? 'Source (on request)' : 'Source / demo (on request)';
+const requestHref = isFilled(site.email)
+  ? `mailto:${site.email}?subject=${encodeURIComponent(`Source or demo request: ${data.title}`)}`
+  : '#contact';
+---
+
+<article class="featured card" aria-labelledby="featured-title" data-reveal>
+  <div class="featured__media">
+    <Picture
+      src={data.cover}
+      alt={data.coverAlt}
+      formats={['avif', 'webp']}
+      widths={[480, 720, 960, 1280]}
+      sizes="(min-width: 70rem) 640px, (min-width: 48rem) 55vw, calc(100vw - 2rem)"
+      class="featured__image"
+    />
+  </div>
+  <div class="featured__body">
+    <p class="eyebrow">Featured project</p>
+    <h3 id="featured-title" class="featured__title">
+      <a href={href}>{data.title}</a>
+    </h3>
+    <p class="featured__summary">{data.summary}</p>
+    <TagList tags={data.stack.slice(0, 7)} label={`Key technologies used in ${data.title}`} />
+    <div class="featured__links">
+      <a class="btn btn--primary" href={href}>
+        Read the case study
+        <Icon name="arrow-right" size={16} />
+      </a>
+      {hasLiveSite && (
+        <a class="link-arrow featured__request" href={data.links.demo}>
+          <Icon name="external-link" size={16} />
+          Live site
+        </a>
+      )}
+      <a class="link-arrow featured__request" href={requestHref}>
+        <Icon name="lock" size={16} />
+        {requestLabel}
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .featured {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .featured__media {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .featured :global(.featured__image) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    /* Keep the top-left (where screenshots usually have the logo) in view when cropped. */
+    object-position: left top;
+  }
+
+  .featured__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    padding: var(--space-m);
+  }
+
+  .featured__body > * {
+    margin: 0;
+  }
+
+  .featured__title {
+    font-size: var(--step-2);
+  }
+
+  .featured__title a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .featured__title a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+
+  .featured__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-m);
+    margin-top: var(--space-2xs);
+  }
+
+  .featured__request {
+    min-height: 2.75rem;
+    font-weight: 600;
+  }
+
+  @media (min-width: 48rem) {
+    .featured {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    }
+
+    .featured__media {
+      border-bottom: 0;
+      border-right: 1px solid var(--border);
+    }
+
+    .featured__body {
+      justify-content: center;
+      padding: var(--space-l);
+    }
+  }
+</style>

@@ -1,0 +1,104 @@
+/*
+ * Design tokens.
+ * Colour contrast (WCAG 2.2): body text ≥ 4.5:1 and UI ≥ 3:1 in both themes.
+ *   Light: text 15.6:1, muted 6.6:1, accent 7.6:1, input border 3.8:1 on --bg
+ *   Dark:  text 15.1:1, muted 8.4:1, accent 9.0:1, input border 4.0:1 on --bg
+ * --border is decorative only; form controls use --border-strong.
+ */
+
+:root {
+  color-scheme: light;
+
+  --bg: #faf8f4;
+  --surface: #ffffff;
+  --surface-2: #f2eee6;
+  --text: #1c1f23;
+  --text-muted: #525a65;
+  --accent: #1f5a43;
+  --accent-hover: #174634;
+  --accent-contrast: #ffffff;
+  --accent-tint: #e6eee9;
+  --border: #e2dcd1;
+  --border-strong: #857f74;
+  --focus: #1f5a43;
+  --shadow-hover: 0 1px 2px rgb(28 31 35 / 0.05), 0 8px 24px rgb(28 31 35 / 0.07);
+
+  --font-serif: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans:
+    'Source Sans 3 Variable', 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  /* Modular type scale, ratio 1.25. Fluid between 320px and 1440px viewports. */
+  --step--2: 0.75rem;
+  --step--1: clamp(0.84rem, 0.82rem + 0.09vw, 0.9rem);
+  --step-0: clamp(1.0625rem, 1.05rem + 0.06vw, 1.125rem); /* 17px → 18px */
+  --step-1: clamp(1.25rem, 1.21rem + 0.2vw, 1.41rem);
+  --step-2: clamp(1.5rem, 1.42rem + 0.4vw, 1.76rem);
+  --step-3: clamp(1.75rem, 1.6rem + 0.75vw, 2.2rem);
+  --step-4: clamp(2.05rem, 1.8rem + 1.25vw, 2.75rem);
+  --step-5: clamp(2.3rem, 1.95rem + 1.9vw, 3.43rem);
+
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 8px;
+
+  --measure: 68ch;
+  --content-max: 1120px;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --header-h: 4rem;
+
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --duration: 200ms;
+}
+
+/* Dark theme: chosen explicitly with the toggle... */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #121417;
+  --surface: #191c20;
+  --surface-2: #22262b;
+  --text: #ece8e1;
+  --text-muted: #a9b0b9;
+  --accent: #7cc4a0;
+  --accent-hover: #9ad5b6;
+  --accent-contrast: #0f1a14;
+  --accent-tint: #1b2a23;
+  --border: #2c3137;
+  --border-strong: #6e7680;
+  --focus: #7cc4a0;
+  --shadow-hover: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+/* ...or followed from the system setting when no choice has been stored. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #121417;
+    --surface: #191c20;
+    --surface-2: #22262b;
+    --text: #ece8e1;
+    --text-muted: #a9b0b9;
+    --accent: #7cc4a0;
+    --accent-hover: #9ad5b6;
+    --accent-contrast: #0f1a14;
+    --accent-tint: #1b2a23;
+    --border: #2c3137;
+    --border-strong: #6e7680;
+    --focus: #7cc4a0;
+    --shadow-hover: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+  }
+}

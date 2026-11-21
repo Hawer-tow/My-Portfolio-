@@ -1,0 +1,60 @@
+---
+/**
+ * Layout for printable pages (the CV). On screen it shows a paper sheet inside the normal site;
+ * in print it becomes a clean A4 document: no navigation, black on white, links written out.
+ */
+import BaseLayout from './BaseLayout.astro';
+import type { SeoProps } from '../components/Seo.astro';
+import type { NavKey } from '../lib/nav';
+
+interface Props extends SeoProps {
+  current?: NavKey;
+}
+
+const props = Astro.props;
+---
+
+<BaseLayout {...props}>
+  <div class="print-page container">
+    <div class="print-page__toolbar no-print">
+      <slot name="toolbar" />
+    </div>
+    <div class="print-page__sheet">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .print-page {
+    padding-block: var(--space-l) var(--space-xl);
+  }
+
+  .print-page__toolbar {
+    max-width: 52rem;
+    margin: 0 auto var(--space-m);
+  }
+
+  .print-page__sheet {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding: clamp(1.25rem, 5vw, 3.5rem);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  @media print {
+    .print-page {
+      max-width: none;
+      padding: 0;
+    }
+
+    .print-page__sheet {
+      max-width: none;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+    }
+  }
+</style>

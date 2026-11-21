@@ -1,0 +1,575 @@
+---
+/**
+ * Case-study template, used for every project:
+ *  1 title and summary · 2 role, timeline, team, status · 3 cover
+ *  4–7 problem, goals, architecture, features (the Markdown/MDX body)
+ *  8 screenshots · 9 challenges · 10 results · 11 what I learned · 12 tech stack · 13 links · 14 next/previous
+ */
+import { getImage, Picture } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Gallery from '../components/Gallery.astro';
+import Icon from '../components/Icon.astro';
+import TagList from '../components/TagList.astro';
+import { site } from '../config/site';
+import { isFilled } from '../lib/placeholders';
+import { projectHref, type Project } from '../lib/projects';
+import { absoluteUrl, withBase } from '../lib/url';
+
+interface Props {
+  project: Project;
+  prev?: Project | undefined;
+  next?: Project | undefined;
+}
+
+const { project, prev, next } = Astro.props;
+const { data } = project;
+
+const ogImage = await getImage({ src: data.cover, width: 1200, height: 750, format: 'jpg' });
+
+const creativeWork = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: data.title,
+  description: data.summary,
+  url: absoluteUrl(`/projects/${project.id}/`),
+  image: new URL(ogImage.src, import.meta.env.SITE).href,
+  keywords: data.stack.join(', '),
+  creator: { '@type': 'Person', name: site.fullName, url: absoluteUrl('/') },
+};
+
+const requestHref = isFilled(site.email)
+  ? `mailto:${site.email}?subject=${encodeURIComponent(`Request: ${data.title}`)}`
+  : withBase('/#contact');
+
+// Files in /public (a PDF, a video) need the base path on a project site; full URLs pass through.
+const hrefFor = (url: string) => (url.startsWith('/') ? withBase(url) : url);
+
+const walkthrough = data.walkthrough;
+const poster = walkthrough
+  ? await getImage({ src: walkthrough.poster, width: 720, format: 'webp' })
+  : undefined;
+
+const meta = [
+  { label: 'Role', value: data.role },
+  { label: 'Timeline', value: data.period },
+  { label: 'Team', value: data.team },
+  { label: 'Status', value: data.status },
+];
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.summary}
+  image={ogImage.src}
+  imageAlt={data.coverAlt}
+  type="article"
+  current="projects"
+  jsonLd={creativeWork}
+>
+  <article class="case" aria-labelledby="case-title">
+    <header class="case__header container">
+      <p class="case__back">
+        <a href={withBase('/#projects')} class="link-arrow">
+          <Icon name="arrow-left" size={16} />
+          All projects
+        </a>
+      </p>
+      <p class="eyebrow">
+        Case study
+        {data.draft && <span class="badge">Draft</span>}
+      </p>
+      <h1 id="case-title" class="case__title">
+        {data.title}
+      </h1>
+      <p class="case__summary">{data.summary}</p>
+      <dl class="case__meta">
+        {meta.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </header>
+
+    <div class="container">
+      <Picture
+        src={data.cover}
+        alt={data.coverAlt}
+        formats={['avif', 'webp']}
+        widths={[640, 960, 1280, 1600]}
+        sizes="(min-width: 72rem) 1120px, calc(100vw - 2rem)"
+        loading="eager"
+        fetchpriority="high"
+        class="case__cover"
+      />
+    </div>
+
+    <div class="container case__body defer-render">
+      <div class="case__prose">
+        <slot />
+      </div>
+    </div>
+
+    {walkthrough && poster && (
+      <section class="case__section container defer-render" aria-labelledby="video-title">
+        <h2 id="video-title">Video walkthrough</h2>
+        <div class="walkthrough">
+          <video
+            class="walkthrough__video"
+            controls
+            preload="none"
+            playsinline
+            poster={poster.src}
+            width={walkthrough.width}
+            height={walkthrough.height}
+            aria-describedby="video-description"
+          >
+            <source src={hrefFor(walkthrough.src)} type="video/mp4" />
+            <track
+              kind="captions"
+              src={hrefFor(walkthrough.captions)}
+              srclang="en"
+              label="English (on-screen text)"
+            />
+            <a href={hrefFor(walkthrough.src)}>Download the video (MP4)</a>
+          </video>
+          <div class="walkthrough__text">
+            <p class="eyebrow">What the video shows</p>
+            <p id="video-description">{walkthrough.description}</p>
+            <p class="muted">No sound. Contact details in the video are blurred.</p>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {data.gallery.length > 0 && (
+      <section class="case__section container defer-render" aria-labelledby="screenshots-title">
+        <h2 id="screenshots-title">Selected screenshots</h2>
+        <Gallery items={data.gallery} />
+      </section>
+    )}
+
+    {data.challenges.length > 0 && (
+      <section class="case__section container defer-render" aria-labelledby="challenges-title">
+        <h2 id="challenges-title">Challenges and solutions</h2>
+        <ol class="challenges">
+          {data.challenges.map((item) => (
+            <li class="challenge card" data-reveal>
+              <h3 class="challenge__title">{item.title}</h3>
+              <dl class="challenge__steps">
+                <div>
+                  <dt>Problem</dt>
+                  <dd>{item.problem}</dd>
+                </div>
+                <div>
+                  <dt>Approach</dt>
+                  <dd>{item.approach}</dd>
+                </div>
+                <div>
+                  <dt>Outcome</dt>
+                  <dd>{item.outcome}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {data.results.length > 0 && (
+      <section class="case__section container defer-render" aria-labelledby="results-title">
+        <h2 id="results-title">Results and impact</h2>
+        <dl class="results">
+          {data.results.map((item) => (
+            <div class="results__item card" data-reveal>
+              <dt>{item.label}</dt>
+              <dd class:list={['tabular', { results__placeholder: !isFilled(item.value) }]}>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+
+    {data.learned.length > 0 && (
+      <section class="case__section container defer-render" aria-labelledby="learned-title">
+        <h2 id="learned-title">What I learned</h2>
+        <ul class="prose learned">
+          {data.learned.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {data.stackGroups.length > 0 && (
+      <section class="case__section container defer-render" aria-labelledby="stack-title">
+        <h2 id="stack-title">Tech stack</h2>
+        <dl class="stack">
+          {data.stackGroups.map((group) => (
+            <div class="stack__group">
+              <dt>{group.label}</dt>
+              <dd>
+                <TagList tags={group.items} label={group.label} />
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    )}
+
+    <section class="case__section container defer-render" aria-labelledby="links-title">
+      <h2 id="links-title">Links</h2>
+      <ul class="case-links">
+        {isFilled(data.links.source) ? (
+          <li>
+            <a href={data.links.source} class="link-arrow">
+              <Icon name="github" />
+              Source code
+            </a>
+          </li>
+        ) : (
+          data.links.sourceOnRequest && (
+            <li>
+              <Icon name="lock" />
+              Source code: available on request. This is a private business system;{' '}
+              <a href={requestHref}>ask me for a walkthrough</a>.
+            </li>
+          )
+        )}
+        {isFilled(data.links.demo) && (
+          <li>
+            <a href={data.links.demo} class="link-arrow">
+              <Icon name="external-link" />
+              Live site: {data.links.demo.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
+            </a>
+            {data.links.demoNote && <span class="muted"> ({data.links.demoNote})</span>}
+          </li>
+        )}
+        {data.links.video !== undefined && (
+          <li>
+            {isFilled(data.links.video) ? (
+              <a href={hrefFor(data.links.video)} class="link-arrow">
+                <Icon name="play" />
+                Demo video
+              </a>
+            ) : (
+              <span>
+                <Icon name="play" />
+                Demo video: <span class="placeholder-note">{data.links.video}</span>
+              </span>
+            )}
+          </li>
+        )}
+        {(data.links.docs !== undefined || data.links.docsNote) && (
+          <li>
+            {isFilled(data.links.docs) ? (
+              <a href={hrefFor(data.links.docs)} class="link-arrow">
+                <Icon name="book-open" />
+                {data.links.docsLabel ?? 'Documentation'}
+              </a>
+            ) : (
+              <span>
+                <Icon name="book-open" />
+                {data.links.docsNote ?? 'Documentation: available on request.'}
+              </span>
+            )}
+          </li>
+        )}
+      </ul>
+    </section>
+
+    {(prev || next) && (
+      <nav class="case__pager container" aria-label="More case studies">
+        {prev ? (
+          <a href={projectHref(prev)} class="pager-link pager-link--prev" rel="prev">
+            <span class="pager-link__label">
+              <Icon name="arrow-left" size={16} /> Previous project
+            </span>
+            <span class="pager-link__title">{prev.data.title}</span>
+          </a>
+        ) : (
+          <span></span>
+        )}
+        {next && (
+          <a href={projectHref(next)} class="pager-link pager-link--next" rel="next">
+            <span class="pager-link__label">
+              Next project <Icon name="arrow-right" size={16} />
+            </span>
+            <span class="pager-link__title">{next.data.title}</span>
+          </a>
+        )}
+      </nav>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .case__header {
+    padding-block: clamp(2rem, 6vw, 4rem) var(--space-l);
+  }
+
+  .case__back {
+    margin-bottom: var(--space-l);
+  }
+
+  .case__back a {
+    min-height: 2.75rem;
+  }
+
+  .case__header .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  .case__title {
+    max-width: 22ch;
+    font-size: var(--step-5);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  .case__summary {
+    max-width: 62ch;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+
+  .case__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--space-s) var(--space-l);
+    margin-top: var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--border);
+  }
+
+  .case__meta dt,
+  .stack__group dt,
+  .challenge__steps dt,
+  .results__item dt {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .case :global(.case__cover) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+
+  .case__body {
+    padding-block: var(--space-xl) 0;
+  }
+
+  /* Body content: Markdown headings and lists from the project file. */
+  .case__prose :global(h2) {
+    margin-top: var(--space-xl);
+  }
+
+  .case__prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .case__prose :global(h3) {
+    margin-top: var(--space-l);
+    font-size: var(--step-1);
+  }
+
+  /* Text keeps a readable measure; the architecture diagram may use the full width. */
+  .case__prose > :global(*) {
+    max-width: var(--measure);
+  }
+
+  .case__prose > :global(.arch) {
+    max-width: none;
+  }
+
+  .case__section {
+    padding-top: var(--space-xl);
+  }
+
+  .challenges {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: challenge;
+  }
+
+  .challenge {
+    margin: 0;
+    padding: var(--space-m);
+    counter-increment: challenge;
+  }
+
+  .challenge:hover {
+    box-shadow: none;
+  }
+
+  .challenge__title {
+    font-size: var(--step-1);
+  }
+
+  .challenge__title::before {
+    content: counter(challenge, decimal-leading-zero);
+    display: block;
+    margin-bottom: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .challenge__steps {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-s);
+  }
+
+  .results__item {
+    padding: var(--space-m);
+  }
+
+  .results__item:hover {
+    box-shadow: none;
+  }
+
+  .results__item dd {
+    margin-top: var(--space-3xs);
+    font-family: var(--font-serif);
+    font-size: var(--step-2);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  /* A metric still waiting for a real figure. */
+  .results__item .results__placeholder {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  .learned {
+    margin: 0;
+  }
+
+  .stack {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .stack__group {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .walkthrough {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-m);
+    align-items: start;
+  }
+
+  .walkthrough__video {
+    display: block;
+    width: 100%;
+    max-width: 22rem;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: #0f1a14;
+  }
+
+  .walkthrough__text {
+    max-width: var(--measure);
+  }
+
+  @media (min-width: 48rem) {
+    .walkthrough {
+      grid-template-columns: 22rem minmax(0, 1fr);
+      gap: var(--space-xl);
+    }
+  }
+
+  .case-links {
+    display: grid;
+    gap: var(--space-xs);
+    max-width: var(--measure);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .case-links li {
+    margin: 0;
+  }
+
+  .case-links :global(.icon) {
+    margin-right: 0.4em;
+    color: var(--text-muted);
+  }
+
+  .case__pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-s);
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-l);
+    border-top: 1px solid var(--border);
+  }
+
+  .pager-link {
+    display: grid;
+    gap: var(--space-3xs);
+    padding: var(--space-s);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+  }
+
+  .pager-link:hover {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .pager-link--next {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .pager-link__label {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .pager-link__title {
+    font-family: var(--font-serif);
+    font-size: var(--step-1);
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  @media (min-width: 48rem) {
+    .stack__group {
+      grid-template-columns: 14rem 1fr;
+      align-items: baseline;
+    }
+  }
+</style>

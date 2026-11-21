@@ -1,0 +1,83 @@
+/*
+ * Print styles for every page; the CV page (/cv/) adds A4 layout rules of its own.
+ * Black on white, no navigation or interactive chrome, link targets printed after the text.
+ */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 15mm;
+  }
+
+  :root,
+  :root[data-theme='dark'] {
+    color-scheme: light;
+    --bg: #fff;
+    --surface: #fff;
+    --surface-2: #fff;
+    --text: #000;
+    --text-muted: #333;
+    --accent: #000;
+    --accent-hover: #000;
+    --accent-contrast: #fff;
+    --accent-tint: #fff;
+    --border: #bbb;
+    --border-strong: #666;
+  }
+
+  html {
+    font-size: 10.5pt;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    line-height: 1.45;
+  }
+
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .no-print,
+  .js-only,
+  .theme-toggle,
+  .nav-toggle {
+    display: none !important;
+  }
+
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  /* Print the target of external links after their text. */
+  main a[href^='http']:not(.print-no-url)::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    font-weight: 400;
+    word-break: break-all;
+  }
+
+  .card {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+
+  li,
+  figure,
+  img {
+    break-inside: avoid;
+  }
+
+  [data-reveal].reveal-pending {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

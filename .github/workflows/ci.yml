@@ -1,0 +1,63 @@
+# Quality checks. Runs on pull requests and branch pushes, and before every deployment
+# (deploy.yml calls this workflow). Any failing check fails the run.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Type check, lint, build, links, accessibility, Lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Check links
+        run: npm run test:links
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Accessibility and layout tests
+        run: npm run test:a11y
+
+      - name: Lighthouse CI
+        run: npm run test:lighthouse
+
+      - name: Keep reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: |
+            playwright-report/
+            test-results/
+            .lighthouseci/
+          if-no-files-found: ignore
+          retention-days: 14

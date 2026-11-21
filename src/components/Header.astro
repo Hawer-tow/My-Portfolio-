@@ -1,0 +1,246 @@
+---
+import { site } from '../config/site';
+import { getNavItems, type NavKey } from '../lib/nav';
+import { withBase } from '../lib/url';
+import Icon from './Icon.astro';
+import Monogram from './Monogram.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  current?: NavKey | undefined;
+}
+
+const { current } = Astro.props;
+const items = getNavItems();
+
+// The CV page is a page of its own; on case studies, "Projects" marks the current section.
+const ariaCurrent = (key: NavKey) => (key !== current ? undefined : key === 'cv' ? 'page' : 'true');
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="wordmark" href={withBase('/')}>
+      <Monogram size={34} />
+      <span class="wordmark__name">{site.fullName}</span>
+      <span class="visually-hidden">, home</span>
+    </a>
+
+    <div class="site-header__actions">
+      <nav class="site-nav" id="site-nav" aria-label="Main">
+        <ul class="site-nav__list">
+          {items.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={ariaCurrent(item.key)}
+                rel={item.external ? 'noopener' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <ThemeToggle />
+      <button
+        class="nav-toggle js-only"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-nav"
+        data-nav-toggle
+      >
+        <Icon name="menu" class="nav-toggle__open" size={20} />
+        <Icon name="close" class="nav-toggle__close" size={20} />
+        <span>Menu</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(1.4) blur(8px);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    min-height: var(--header-h);
+  }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-width: 0;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .wordmark:hover {
+    color: var(--text);
+  }
+
+  .wordmark__name {
+    overflow: hidden;
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+  }
+
+  .site-nav__list {
+    display: flex;
+    gap: var(--space-3xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-nav__list li {
+    margin: 0;
+  }
+
+  .site-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.7rem;
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .site-nav a:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .site-nav a[aria-current] {
+    color: var(--accent);
+    font-weight: 600;
+    box-shadow: inset 0 -2px 0 var(--accent);
+    border-radius: 0;
+  }
+
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    padding: 0 0.8rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .nav-toggle[aria-expanded='false'] :global(.nav-toggle__close),
+  .nav-toggle[aria-expanded='true'] :global(.nav-toggle__open) {
+    display: none;
+  }
+
+  @media (max-width: 60rem) {
+    /* Without JavaScript the links simply wrap onto their own row. */
+    :global(html:not(.js)) .site-header__inner {
+      flex-wrap: wrap;
+      padding-block: var(--space-2xs);
+    }
+
+    :global(html:not(.js)) .site-header__actions {
+      flex: 1 1 100%;
+    }
+
+    :global(html:not(.js)) .site-nav__list {
+      flex-wrap: wrap;
+    }
+
+    :global(html:not(.js)) .site-header {
+      position: static;
+    }
+
+    /* With JavaScript the links collapse behind the menu button. */
+    :global(.js) .nav-toggle {
+      display: inline-flex;
+    }
+
+    :global(.js) .site-nav {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      display: none;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 12px 24px rgb(0 0 0 / 0.06);
+    }
+
+    :global(.js) .site-nav.is-open {
+      display: block;
+    }
+
+    :global(.js) .site-nav__list {
+      flex-direction: column;
+      gap: 0;
+      max-width: calc(var(--content-max) + 2 * var(--gutter));
+      margin-inline: auto;
+      padding: var(--space-2xs) var(--gutter) var(--space-s);
+    }
+
+    :global(.js) .site-nav a {
+      display: flex;
+      min-height: 3rem;
+      padding: 0 var(--space-2xs);
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+    }
+
+    :global(.js) .site-nav a[aria-current] {
+      box-shadow: inset 3px 0 0 var(--accent);
+      padding-left: var(--space-s);
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const nav = document.getElementById('site-nav');
+
+  if (toggle && nav) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      nav.classList.toggle('is-open', open);
+    };
+
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+
+    // Close after choosing a link, on Escape, and when the layout grows past the breakpoint.
+    nav.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    matchMedia('(min-width: 60.0625rem)').addEventListener('change', () => setOpen(false));
+  }
+</script>

@@ -1,0 +1,328 @@
+---
+/**
+ * Screenshot gallery. Each thumbnail links to the full-size image, so it works without
+ * JavaScript; with JavaScript the link opens in an accessible <dialog> lightbox instead.
+ */
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import GallerySlide from './GallerySlide.astro';
+import Icon from './Icon.astro';
+
+interface Slide {
+  src: ImageMetadata;
+  alt: string;
+  caption: string;
+  /** Images sharing a group are shown together under that heading. */
+  group?: string | undefined;
+}
+
+interface Props {
+  items: Slide[];
+  /** Used to keep ids unique if more than one gallery is on a page. */
+  id?: string;
+  /**
+   * How many images each group shows before "Show more": one full row of phone screenshots,
+   * or two rows of landscape ones. List the strongest images first in the frontmatter.
+   */
+  visible?: { landscape: number; portrait: number };
+}
+
+const { items, id = 'gallery', visible = { landscape: 6, portrait: 5 } } = Astro.props;
+
+const slides = await Promise.all(
+  items.map(async (item) => {
+    const full = await getImage({ src: item.src, width: Math.min(item.src.width, 1600), format: 'webp' });
+    const ratio = item.src.width / item.src.height;
+    const shape: 'portrait' | 'landscape' | 'wide' =
+      ratio < 1 ? 'portrait' : ratio > 2 ? 'wide' : 'landscape';
+    return { ...item, full: full.src, shape };
+  }),
+);
+
+// Groups keep the order in which they first appear. A group of phone screenshots gets tall frames.
+const groups: { title: string | undefined; slides: typeof slides; portrait: boolean }[] = [];
+for (const slide of slides) {
+  let group = groups.find((g) => g.title === slide.group);
+  if (!group) {
+    group = { title: slide.group, slides: [], portrait: false };
+    groups.push(group);
+  }
+  group.slides.push(slide);
+}
+for (const group of groups) group.portrait = group.slides.every((s) => s.shape === 'portrait');
+
+const split = (group: (typeof groups)[number]) => {
+  const count = group.portrait ? visible.portrait : visible.landscape;
+  // Never hide just one image behind a toggle.
+  const cut = group.slides.length > count + 1 ? count : group.slides.length;
+  return { shown: group.slides.slice(0, cut), more: group.slides.slice(cut) };
+};
+---
+
+{slides.length > 0 && (
+  <div class="gallery" data-gallery id={id}>
+    {groups.map((group) => {
+      const { shown, more } = split(group);
+      const gridClass = ['gallery__grid', { 'gallery__grid--portrait': group.portrait }];
+      const what = group.title ? `${group.title.toLowerCase()} screenshots` : 'screenshots';
+      return (
+        <div class="gallery__group">
+          {group.title && <h3 class="gallery__group-title">{group.title}</h3>}
+          <ul class:list={gridClass}>
+            {shown.map((slide) => (
+              <GallerySlide slide={slide} portraitGroup={group.portrait} />
+            ))}
+          </ul>
+          {more.length > 0 && (
+            <details class="gallery__more">
+              <summary class="gallery__more-toggle">
+                Show {more.length} more {what}
+              </summary>
+              <ul class:list={gridClass}>
+                {more.map((slide) => (
+                  <GallerySlide slide={slide} portraitGroup={group.portrait} />
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      );
+    })}
+
+    <dialog class="lightbox" aria-label="Screenshot viewer" data-lightbox>
+      <div class="lightbox__frame">
+        <figure class="lightbox__figure">
+          <img class="lightbox__image" src="data:," alt="" data-lightbox-image />
+          <figcaption class="lightbox__caption">
+            <span data-lightbox-caption></span>
+            <span class="lightbox__count tabular" data-lightbox-count></span>
+          </figcaption>
+        </figure>
+        <div class="lightbox__controls">
+          <button type="button" class="lightbox__btn" data-lightbox-prev>
+            <Icon name="arrow-left" />
+            <span>Previous</span>
+          </button>
+          <button type="button" class="lightbox__btn" data-lightbox-next>
+            <span>Next</span>
+            <Icon name="arrow-right" />
+          </button>
+          <button type="button" class="lightbox__btn lightbox__close" data-lightbox-close>
+            <Icon name="close" />
+            <span>Close</span>
+          </button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+)}
+
+<style>
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery :global(.gallery__item) {
+    margin: 0;
+  }
+
+  .gallery :global(.gallery__link) {
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+    transition: box-shadow var(--duration) var(--ease);
+  }
+
+  .gallery :global(.gallery__link:hover) {
+    box-shadow: var(--shadow-hover);
+  }
+
+  .gallery__group + .gallery__group {
+    margin-top: var(--space-xl);
+  }
+
+  .gallery__more {
+    margin-top: var(--space-m);
+  }
+
+  .gallery__more-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.4em 1em;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    list-style-position: inside;
+  }
+
+  .gallery__more-toggle:hover {
+    background: var(--surface-2);
+  }
+
+  .gallery__more[open] > .gallery__more-toggle {
+    margin-bottom: var(--space-m);
+  }
+
+  .gallery__group-title {
+    margin-bottom: var(--space-s);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* Phone screenshots: narrower columns with tall frames. */
+  .gallery__grid--portrait {
+    grid-template-columns: repeat(auto-fill, minmax(min(45%, 11rem), 1fr));
+  }
+
+  /* Uniform 16:10 frames. Very wide or tall images are shown whole inside the frame. */
+  .gallery :global(.gallery__image) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    /* Screens keep their titles top-left, so crop from the right and bottom. */
+    object-position: left top;
+  }
+
+  .gallery :global(.gallery__image--portrait),
+  .gallery :global(.gallery__image--wide) {
+    object-fit: contain;
+  }
+
+  .gallery__grid--portrait :global(.gallery__image--portrait) {
+    aspect-ratio: 1 / 2;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .gallery :global(.gallery__caption) {
+    margin-top: var(--space-2xs);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .lightbox {
+    width: min(100vw - 2rem, 72rem);
+    max-width: none;
+    max-height: calc(100vh - 2rem);
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .lightbox::backdrop {
+    background: rgb(10 12 14 / 0.82);
+  }
+
+  .lightbox__frame {
+    display: grid;
+    gap: var(--space-s);
+    padding: var(--space-s);
+  }
+
+  .lightbox__image {
+    width: 100%;
+    max-height: calc(100vh - 12rem);
+    object-fit: contain;
+    background: var(--surface-2);
+    border-radius: var(--radius);
+  }
+
+  .lightbox__caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2xs);
+    margin-top: var(--space-2xs);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .lightbox__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+
+  .lightbox__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: 2.75rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .lightbox__btn:hover {
+    background: var(--surface-2);
+  }
+
+  .lightbox__close {
+    margin-left: auto;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const dialog = gallery.querySelector<HTMLDialogElement>('[data-lightbox]');
+    const image = gallery.querySelector<HTMLImageElement>('[data-lightbox-image]');
+    const caption = gallery.querySelector<HTMLElement>('[data-lightbox-caption]');
+    const count = gallery.querySelector<HTMLElement>('[data-lightbox-count]');
+    const links = [...gallery.querySelectorAll<HTMLAnchorElement>('[data-lightbox-item]')];
+    if (!dialog || !image || !caption || !count || typeof dialog.showModal !== 'function') return;
+
+    let current = 0;
+
+    const show = (index: number) => {
+      current = (index + links.length) % links.length;
+      const link = links[current];
+      if (!link) return;
+      image.src = link.href;
+      image.alt = link.dataset.alt ?? '';
+      caption.textContent = link.dataset.caption ?? '';
+      count.textContent = `${current + 1} of ${links.length}`;
+    };
+
+    links.forEach((link, index) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        show(index);
+        dialog.showModal();
+      });
+    });
+
+    gallery.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => show(current - 1));
+    gallery.querySelector('[data-lightbox-next]')?.addEventListener('click', () => show(current + 1));
+    gallery.querySelector('[data-lightbox-close]')?.addEventListener('click', () => dialog.close());
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(current - 1);
+      if (event.key === 'ArrowRight') show(current + 1);
+    });
+
+    // Clicking the dimmed backdrop closes the viewer.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>

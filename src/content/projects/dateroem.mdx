@@ -1,0 +1,463 @@
+---
+# TODO(owner): confirm the business owner is happy for the business name and screenshots to be
+# public. If not, change `title` to a neutral name such as "Timber business platform".
+#
+# Confidentiality: never add API keys, server or tunnel addresses, M-Pesa till or shortcode
+# numbers, staff or customer phone numbers, or real customer data. Anonymise every screenshot.
+
+# {{PROJECT_DISPLAY_NAME}}: default "Dateroem Wood Sales".
+title: Dateroem Wood Sales
+shortTitle: Dateroem
+summary: >-
+  A full-stack business platform for a Kenyan timber company: a customer shop with M-Pesa
+  payments, an Android staff app for field operations, and a desktop admin console, sharing one
+  Java backend.
+role: Sole developer, from requirements to deployment
+period: June – November 2026
+team: Solo, working with the business owner and board
+status: Live and taking real orders since October 2026; handed over in November 2026
+featured: true
+draft: false
+order: 1
+areas: [Web, Mobile, Desktop, Backend, Data]
+stack:
+  - Java 17 · Spring Boot
+  - MySQL 8
+  - FastAPI
+  - React 18
+  - Kotlin · Jetpack Compose
+  - PySide6 (Qt 6)
+  - M-Pesa Daraja
+stackGroups:
+  - label: Core backend
+    items: [Java 17, Spring Boot, Maven, JdbcTemplate, Scheduled jobs, BCrypt]
+  - label: Database
+    items: [MySQL 8, Versioned SQL migrations, Stored procedures]
+  - label: Backends-for-frontends
+    items: [Python, FastAPI, Uvicorn, httpx, Pydantic]
+  - label: Customer website
+    items: [React 18, React Router, Vite, Modern CSS]
+  - label: Android staff app
+    items: [Kotlin, Jetpack Compose, Material 3, Retrofit, Gson, DataStore, BiometricPrompt, CameraX / Media]
+  - label: Desktop admin console
+    items: [Python, PySide6 (Qt 6)]
+  - label: Infrastructure
+    items: [Caddy, Linux / Ubuntu (WSL2), systemd, Git]
+  - label: External services
+    items: [Safaricom Daraja (M-Pesa), Africa’s Talking SMS, Google Identity, Gmail SMTP, Anthropic Claude API]
+# Screenshots use demo or sample data. Originals are in incoming-screenshots/ (git-ignored):
+# the 21 Oct set from the owner, and from-dateroem-docs/ taken from the project documentation.
+# In admin-activity-log.jpg the usernames and addresses are hidden; in desktop-sign-in.jpg the
+# server line is hidden.
+# Batch 2 (18 Nov: Android trips, trees, delivery, expenses, assistant; desktop users, phones and
+# trip expenses; bulk orders) was taken on a local copy with sample data. See
+# incoming-screenshots/dateroem-batch-2/NOTES.txt.
+cover: ../../assets/images/projects/dateroem/cover.jpg
+coverAlt: >-
+  Dateroem customer website home page in the Forest theme: the painted wood wordmark, a Featured
+  campaign banner with its photo, and product cards with photos and prices.
+gallery:
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-catalogue.jpg
+    alt: >-
+      Product catalogue grid with six timber products, each with a photo, price in Kenyan
+      shillings and a star rating.
+    caption: Product catalogue. Photos, prices and ratings; the grid adapts to any screen width.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-cart.jpg
+    alt: >-
+      Cart with two products and a total of KES 21,600, a delivery or pickup area picker, an M-Pesa
+      number field with a sample number, a confirm-the-number tick box and a Place order button.
+    caption: Cart. Delivery area, the M-Pesa number to prompt, and a check that the number is right.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-checkout.jpg
+    alt: >-
+      Order placed page for demo order DW-1024, with the message that an STK push was sent, the
+      items ordered, the delivery status and an estimated delivery date.
+    caption: >-
+      After Place order. The STK push is sent and the order waits for Safaricom to confirm payment
+      (demo order).
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-track-order.jpg
+    alt: >-
+      Track my order page: a ticket and the last three digits of a phone number entered, a
+      four-step progress bar at On a delivery, the delivery date, pickup area, total, and the
+      driver's first name and vehicle.
+    caption: Track my order. A ticket plus the last three phone digits, no sign-in needed (sample order).
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-story.jpg
+    alt: >-
+      Story page chapter two, Precision Timber Logging, over a forest photograph, with a progress
+      bar for the five chapters from Acquisition to Delivery.
+    caption: “From the forest to your door”, a scroll-driven story in five chapters.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-ai-assistant.jpg
+    alt: The Ask Dateroem help assistant panel open on the right of the product catalogue.
+    caption: “Ask Dateroem”, the AI help assistant, open beside the catalogue.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-handover-code.jpg
+    alt: >-
+      Order placed page with a four-digit handover code to give the driver or pickup point, the
+      order ticket, the items ordered and the delivery status.
+    caption: >-
+      Every order gets a handover code; the timber is released only to someone who has it (test
+      order).
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-phone-code.jpg
+    alt: >-
+      Confirm your phone number dialog over the cart: a six-digit code sent by SMS to a masked
+      number, a wrong code entered, and the message That code isn't right, 4 tries left.
+    caption: Before a first order, the phone number is confirmed by SMS code, with limited tries.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-email-code.jpg
+    alt: >-
+      Check your email step asking for a six-digit code sent to a masked email address, beside
+      the forest story panel.
+    caption: Accounts with orders also need a code sent by email after the password.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-bulk-order.jpg
+    alt: >-
+      Bulk and Heavy Orders page with a photo slideshow of stacked white oak timber and a note that large orders are arranged directly with the team.
+    caption: >-
+      Bulk and heavy orders, arranged with the team, with an example-photo slideshow.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-featured.jpg
+    alt: Featured page showing a running campaign with its video and the product it covers.
+    caption: Featured page. A running campaign with its video and the products it covers.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-light-theme.jpg
+    alt: The customer website home page in the Light theme.
+    caption: The same home page in the Light theme.
+  - group: Customer website
+    src: ../../assets/images/projects/dateroem/website-dark-theme.jpg
+    alt: The customer website home page in the Dark theme.
+    caption: And in the Dark theme. The choice is saved with the account and used by all three apps.
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-dashboard.jpg
+    alt: >-
+      Dashboard with tiles for database tables, products, campaigns, active trips and users, and a
+      sidebar listing every section.
+    caption: Dashboard. Key counts at a glance and every section in the sidebar (demo data).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-pending-orders.jpg
+    alt: >-
+      Pending Orders by Customer: orders grouped per customer and area with LATE and DUE SOON
+      deadline flags, and a suggestion to send the group on a light delivery.
+    caption: Pending orders grouped per customer and area, with deadlines flagged (demo customers).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-trip-expenses.jpg
+    alt: >-
+      Trip 1 Expenses tab with one transport entry, diesel for the demo lorry, KES 3,500 marked NOT PAID, and Pay (Send Money) and Assign Transaction buttons.
+    caption: >-
+      A trip’s expenses by category; an unpaid entry is paid by Send Money or matched to an incoming payment.
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-phone-approval.jpg
+    alt: >-
+      Phones tab with a demo worker’s new phone waiting for approval and selected, with Approve and Reject, above approved and blocked phones.
+    caption: >-
+      Phone approval. Each account uses one approved phone; a new phone waits for an administrator (demo accounts).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-activity-log.jpg
+    alt: >-
+      Activity log reporting that the log is intact and all 104 sealed lines match their
+      fingerprints, with filters, a list of actions, and the before and after values of a product
+      change. Usernames and addresses are hidden.
+    caption: >-
+      Activity log. Append-only and sealed, so tampering shows; each change keeps its before and
+      after (usernames and addresses hidden here).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-server-control.jpg
+    alt: >-
+      Servers panel with tabs for eight services, Start All and Stop All buttons, and the live log
+      of the Java backend starting up.
+    caption: Server control. Start and stop all eight services, with live logs (sample log lines).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/desktop-entrance.jpg
+    alt: >-
+      The company emblem and wooden Dateroem wordmark over a misty forest photograph, with the
+      line Growing Timber, Growing Futures.
+    caption: Entrance. The last moment of the intro animation before it dissolves into sign-in.
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/desktop-sign-in.jpg
+    alt: >-
+      Admin Control sign-in card with username and password fields, a wooden Sign In button and a
+      Manage Servers button, over the misty forest.
+    caption: Sign-in for Admin and SuperAdmin accounts, with drifting mist behind.
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-users.jpg
+    alt: >-
+      Users table of demo accounts with roles, emails and verified phones, a role filter, Show disabled, and Edit, Reset Password and Disable Account buttons.
+    caption: >-
+      User management: roles, password reset and disabling accounts (demo accounts).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-products.jpg
+    alt: >-
+      Products table with names, types, descriptions, prices and stock, plus search, Show deleted,
+      New Product, Edit, Retire and Delete controls.
+    caption: Products. Search, add, edit and retire items; Show deleted reveals soft-deleted ones.
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-assign-delivery.jpg
+    alt: >-
+      Step 2 of 2 for Trip 4: pick or create a light delivery, choose the vehicle and date, choose
+      whether to share the driver's first name and number plate, and tick the orders.
+    caption: Putting orders on a delivery for a trip, optionally sharing the driver and plate.
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/admin-trip-deliveries.jpg
+    alt: >-
+      Trip 4 Deliveries tab in the Light theme: one light delivery with its ticket, status and
+      date, and the two orders on it.
+    caption: A trip's deliveries and the orders on each one (Light theme, sample data).
+  - group: Desktop admin console
+    src: ../../assets/images/projects/dateroem/desktop-theme-settings.jpg
+    alt: The Appearance settings panel shown three times, with the Forest, Dark and Light themes selected.
+    caption: Settings, Appearance. Forest, Dark and Light, saved with the account.
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-trip-list.jpg
+    alt: >-
+      Trees screen for the active trip with three registered plots for Demo Farmer, each with a tree count and species, and a Finalize Trees card.
+    caption: >-
+      Trees registered on the active buying trip (demo farmer).
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-trip-gps.jpg
+    alt: >-
+      Edit Tree Registration form with the household, coordinates filled in from the location pin, the number of trees, tree type, status and farmer.
+    caption: >-
+      Tree registration. The pin fills in GPS from the phone and works offline (made-up coordinates).
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-delivery.jpg
+    alt: >-
+      Mark as delivered dialog for demo order DW-DEMO01 with the customer’s handover code, the name of the person receiving it and a signature pad signed Demo.
+    caption: >-
+      Delivery. The driver enters the customer’s handover code and takes a signature.
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-expenses.jpg
+    alt: >-
+      Expense Categories screen with totals for transport, communications, machines, accommodation, other expenses, permits, salaries and farmer payments.
+    caption: >-
+      Trip expenses by category, recorded from the field.
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-ai-action.jpg
+    alt: >-
+      Assistant panel ending a step-by-step answer about recording diesel for a trip, with a Go to Expenses action button.
+    caption: >-
+      The role-aware assistant answers with steps and a button that opens the right screen.
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-ai-question.jpg
+    alt: >-
+      Assistant panel with the question How do I record diesel for this trip? and the start of a numbered answer.
+    caption: >-
+      Asking the assistant how to record diesel for the trip (signed in as a demo driver).
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-fingerprint-lock.jpg
+    alt: >-
+      Lock screen reading Dateroem is locked, Touch the fingerprint sensor to continue, with a
+      wooden Unlock button.
+    caption: Fingerprint lock. The signed-in app opens only for the phone’s owner.
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-home-light.jpg
+    alt: >-
+      Staff app Home in the Light theme with the business card, a campaigns counter and the bottom
+      dock with the wooden trip dial.
+    caption: Home in the Light theme, with the dock for the menu, trip dial and AI assistant.
+  - group: Android staff app
+    src: ../../assets/images/projects/dateroem/android-entrance.jpg
+    alt: A photograph of an old oak tree in a meadow, the first frame of the app’s opening animation.
+    caption: Entrance. An old oak, before mist rolls in to a pine forest.
+walkthrough:
+  src: /media/dateroem-overview.mp4
+  captions: /media/dateroem-overview.vtt
+  poster: ../../assets/images/projects/dateroem/video-poster.jpg
+  width: 720
+  height: 1280
+  description: >-
+    A 44-second advert for the customer website, recorded from the live site with a mocked
+    order: a title asking “Do you need luxury hardwood?”, the home page at dateroemwoods.co.ke,
+    poles, sawn timber, slabs and decor, choosing an amount and ordering in a tap, paying with an
+    M-Pesa prompt on the phone (shown as an illustration), delivery or pickup across Kenya, the
+    promise to replace or refund damaged goods, and a closing “Order today” card.
+challenges:
+  - title: Preventing fake payment confirmations
+    problem: >-
+      An M-Pesa callback is an ordinary HTTP request. If the system trusted it on its own, anyone
+      who could reach the endpoint could mark an order as paid.
+    approach: >-
+      I never trust the callback alone. Each one is confirmed with Safaricom’s own transaction
+      query before anything changes, and the order and payment updates are idempotent, so a
+      repeated callback has no further effect.
+    outcome: A forged callback cannot mark an order as paid, and duplicate callbacks are harmless.
+  - title: One account, one phone
+    problem: >-
+      Staff use the field app on their own phones. A stolen or shared password should not be
+      enough to open it.
+    approach: >-
+      Each phone holds its own key. At sign-in the app signs a one-time challenge from the server,
+      and only phones an administrator has approved receive a session. The app also sits behind
+      the fingerprint or screen lock.
+    outcome: A password alone no longer opens the staff app; access is tied to approved phones.
+  - title: Working with poor connectivity
+    problem: Field staff record trees, trips and payments in places with weak or no signal.
+    approach: >-
+      The GPS pin works offline, M-Pesa messages read on the company SIM wait in a queue that
+      syncs when the connection returns, and the dashboard keeps a copy for when the signal
+      drops, with pull-to-reload once it is back.
+    outcome: >-
+      Payment records survive a weak signal, and staff can still see their dashboard when they
+      are offline.
+  - title: Three very different clients
+    problem: >-
+      A website, an Android app and a Qt desktop console each need data in a different shape, and
+      a change for one should not break the others.
+    approach: >-
+      I used the backend-for-frontend pattern: one small FastAPI service per client shapes the
+      data and handles sign-in limits and error wording, while the Spring Boot core keeps the
+      business rules.
+    outcome: Each client stays simple and can change on its own, with business rules in one place.
+  - title: One brand across web, Android and desktop
+    problem: The three apps use different toolkits but should feel like one product.
+    approach: >-
+      Colour tokens and assets are generated from one source, including the wood texture system
+      and the emblem at every icon size. Per-account themes apply live, without restarting or
+      signing in again.
+    outcome: The apps look consistent, and a theme change applies immediately.
+  - title: Keeping a small team able to run it
+    problem: The people who run the system day to day are not developers.
+    approach: >-
+      Errors are written in plain language with no stack traces, a maintenance page appears when
+      a service is down, and a desktop control panel starts and stops each service with live logs.
+    outcome: Routine operations happen in the admin console rather than at a terminal.
+# Real figures, read-only, taken from the project on 17 Nov 2026. Order and payment counts are
+# still too small to quote, so the status line says "taking real orders" instead.
+results:
+  - label: Live on its own domain since
+    value: 25 Oct 2026
+  - label: Core API response, median on the server
+    value: 95 ms
+  - label: Technical documents handed over
+    value: '18'
+  - label: Versioned database migrations
+    value: 40+
+# TODO(owner): rewrite these in your own words.
+learned:
+  - Requirements become clearer once people use the software. Regular reviews with the owner kept me building the right things.
+  - Security has to be designed in. Payment verification and device binding shaped the architecture from the start, not at the end.
+  - Writing the documentation as I went made the system easier to hand over, and easier for me to return to.
+  - Field conditions are real constraints. Designing for weak connectivity changed how I think about state and feedback.
+  - Plain error messages matter as much as correct code when non-technical staff run the system.
+links:
+  sourceOnRequest: true
+  # The public website (live since 25 October 2026).
+  demo: https://dateroemwoods.co.ke
+  # Public two-page system overview: no addresses, keys or usernames.
+  docs: /docs/dateroem-system-overview.pdf
+  docsLabel: System overview (PDF, 2 pages)
+---
+
+import DateroemArchitecture from '../../components/diagrams/DateroemArchitecture.astro';
+
+## Problem and context
+
+The business buys trees from farmers on buying trips, has them sawn and finished, and sells poles, sawn timber, boards, hardwood and furniture templates. Some orders are bulk (“heavy”) orders delivered by lorry.
+
+Before this system, orders, trips, expenses, farmer payments and deliveries were tracked by hand. Customers paid by M-Pesa, but nothing reconciled those payments against orders.
+
+## Goals
+
+- Customers can browse the catalogue and pay online.
+- Staff record trips, trees, expenses and deliveries from the field, sometimes offline.
+- Administrators control users, money and servers from one place.
+
+## My role
+
+I was the sole developer. I gathered requirements with the business owner and board, then handled the architecture, implementation, security hardening, deployment and documentation. The system went live in October 2026, and in November I handed it over complete, with a go-live checklist of the tasks that remain the owner's.
+
+## Architecture
+
+<DateroemArchitecture />
+
+- **Clients.** A React website for customers, an Android app (Kotlin, Jetpack Compose) for staff, and a desktop admin console (Python, PySide6/Qt) for administrators.
+- **Backends-for-frontends.** Three small FastAPI services, one per client. Each shapes the data for its client, passes sign-in tokens through, limits sign-in attempts, turns errors into plain messages and handles media uploads.
+- **Core API.** A Spring Boot (Java 17) REST backend with about 170 endpoints over MySQL 8. It owns the business rules, authentication, payments, SMS, email and AI features.
+- **Edge.** A Caddy reverse proxy routes `/`, `/mobile-api/` and `/admin-api/`, and serves a friendly maintenance page when a service is down. Development ran on Ubuntu (WSL2) behind a secure tunnel. Since 25 October 2026 the system has run live on a Linux VPS under its own domain, dateroemwoods.co.ke, with systemd services, HTTPS through Caddy, and releases installed from checksummed packages.
+
+## Key features
+
+### Commerce
+
+- Product catalogue with photos and videos, campaigns, a Featured banner, search, and ratings and reviews with consent and moderation.
+- Cart and delivery-area picker with “near me” geolocation.
+- Bulk-order enquiry page with an example-photo slideshow.
+- Shop-by-type buttons built automatically from the product types, and sliding carousels for featured campaigns and delivery areas.
+- Order tickets (DW-…) and a public “Track my order” page that needs only the ticket and the last three digits of the phone number.
+- Returns, privacy and terms pages, with the AI assistant and FAQs following the same rules.
+
+### Payments
+
+- Safaricom M-Pesa (Daraja) STK Push checkout, live in production.
+- Every payment callback is verified against Safaricom’s own transaction query, so a forged callback cannot mark an order as paid.
+- Receipts stored per payment, and order status polled until confirmed.
+- Admin payout flows with amount and recipient guards: a payout must go to the number on file unless the SuperAdmin approves.
+- Limits on payment prompts per account, number and address, so the checkout cannot be used to flood someone's phone.
+
+### Identity and security
+
+- JWT authentication and BCrypt password hashing.
+- Five roles (Customer, Employee, Marketer, Admin, SuperAdmin) enforced on the server, with a single protected SuperAdmin.
+- Google Sign-In with server-side ID-token verification.
+- Customer phone numbers verified by SMS one-time codes (Africa’s Talking). Only hashes are stored, with rate limits per number, per account and per hour.
+- Device binding: the staff app signs a one-time server challenge with a per-phone key, and only approved phones get a session. The desktop console runs only on approved computers.
+- A fingerprint or screen-lock gate in the Android app, and a sign-in cut-off after a data clean-up.
+- Wrong-password limits, plus a code by email for accounts that have orders.
+- A handover code on every order: goods are released only to someone who has it, and every handover is logged.
+- A tamper-evident activity log: append-only, sealed with a hash chain, recording who did what with before and after values. Only the SuperAdmin can view or export it.
+- Staff ID details encrypted at rest, open only to the SuperAdmin, and each opening logged.
+- Account profiles, one-time temporary passwords on reset, and an idle lock on the desktop console.
+- User-friendly errors everywhere, with no stack traces exposed.
+
+### Field operations (Android)
+
+- Buying trips, with one active trip across the whole app.
+- Tree registration with GPS coordinates captured offline.
+- Expenses, loans and capital recorded per trip.
+- Heavy and light deliveries, confirmed with the customer’s handover code and an on-screen signature.
+- Camera photo and video capture with on-device compression.
+- M-Pesa SMS reading on the company SIM to reconcile payments made outside the app, with an offline queue that syncs later.
+- A voice assistant using speech recognition and text-to-speech.
+- Pull-to-reload, and a copy of the dashboard kept for when the signal drops.
+
+### Administration (desktop)
+
+- Dashboard and insights.
+- Pending orders grouped per customer and area, with LATE and DUE SOON deadlines, sent to light or bulk deliveries on a trip.
+- Company data for the SuperAdmin: API keys and passwords can be replaced from the console, each change confirmed with a code sent by email.
+- Notices written on the desktop that appear under a bell on the website.
+- User management: enable or disable accounts, and approve phones and computers.
+- Products, marketing and campaign media, chosen from the PC and uploaded on save.
+- Trips and finance, delivery areas, ratings moderation and an FAQ editor.
+- A raw database browser for the SuperAdmin.
+- A server control panel that starts and stops every service, with live logs.
+
+### AI assistant
+
+- A chat assistant on the website for customers.
+- A role-aware assistant in the staff app that suggests actions for each user’s role. It runs server-side on the Anthropic Claude API, with a fallback provider.
+
+### Experience and design
+
+- One brand across all three apps: a painted wood texture system generated from code, a company emblem exported to every icon size, and a cinematic photographic entrance animation with drifting mist.
+- User-selectable themes (Forest, Dark and Light), stored per account.
+- Reduced-motion support and screen-reader labels.
+- A scroll-driven “From the forest to your door” story page.
+
+### Data
+
+- About 40 tables and more than 40 versioned SQL migrations.
+- Stored functions and procedures for trip profit, soft deletes and an audit log.
+
+### Engineering practice
+
+- Eighteen technical documents (architecture, API, database, operations, troubleshooting and a go-live checklist), generated and kept under version control.
+- A secret scan and automated document checks.
+- Manual end-to-end testing over USB on real Android hardware, plus headless-browser screenshots.
+- A backup before every schema change.
+- Search engine set-up: per-page titles, a sitemap, product structured data and a verified Google Search Console property.
+- A security review at handover: fail2ban, a least-privilege database account, a Permissions-Policy header and scheduled restarts.

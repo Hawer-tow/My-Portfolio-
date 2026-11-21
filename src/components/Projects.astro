@@ -1,0 +1,144 @@
+---
+import { site } from '../config/site';
+import { projectAreas } from '../lib/areas';
+import { getProjects } from '../lib/projects';
+import FeaturedProject from './FeaturedProject.astro';
+import ProjectCard from './ProjectCard.astro';
+import Section from './Section.astro';
+
+const projects = await getProjects();
+const featured = projects.find((project) => project.data.featured);
+const others = projects.filter((project) => project !== featured);
+
+// Offer filter chips only for areas that actually have projects, and only when there is a choice.
+const areas = projectAreas.filter((area) => others.some((project) => project.data.areas.includes(area)));
+const showFilters = site.features.showProjectFilters && others.length > 1 && areas.length > 1;
+---
+
+<Section id="projects" title="Projects" intro="Selected work, with a case study for each project.">
+  {featured && <FeaturedProject project={featured} />}
+
+  <div class="projects__more">
+    <h3 class="projects__heading">More projects</h3>
+
+    {showFilters && (
+      <div class="filters js-only" role="group" aria-label="Filter projects by area" data-filters>
+        <button type="button" class="filter" aria-pressed="true" data-filter="all">
+          All
+        </button>
+        {areas.map((area) => (
+          <button type="button" class="filter" aria-pressed="false" data-filter={area}>
+            {area}
+          </button>
+        ))}
+      </div>
+    )}
+
+    {others.length > 0 ? (
+      <>
+        <ul class="projects__grid" data-project-grid>
+          {others.map((project) => (
+            <li>
+              <ProjectCard project={project} />
+            </li>
+          ))}
+        </ul>
+        <p class="visually-hidden" aria-live="polite" data-filter-status></p>
+      </>
+    ) : (
+      <p class="muted">Further case studies are being written up and will appear here soon.</p>
+    )}
+  </div>
+</Section>
+
+<style>
+  .projects__more {
+    margin-top: var(--space-2xl);
+  }
+
+  .projects__heading {
+    margin-bottom: var(--space-s);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-bottom: var(--space-m);
+  }
+
+  .filter {
+    min-height: 2.5rem;
+    padding: 0.3em 0.95em;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color var(--duration) var(--ease),
+      color var(--duration) var(--ease);
+  }
+
+  .filter:hover {
+    background: var(--surface-2);
+  }
+
+  .filter[aria-pressed='true'] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+  }
+
+  .projects__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .projects__grid > li {
+    display: grid;
+    margin: 0;
+  }
+
+  .projects__grid > li[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  const group = document.querySelector<HTMLElement>('[data-filters]');
+  const grid = document.querySelector<HTMLElement>('[data-project-grid]');
+  const status = document.querySelector<HTMLElement>('[data-filter-status]');
+
+  if (group && grid) {
+    const buttons = [...group.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const items = [...grid.querySelectorAll<HTMLLIElement>(':scope > li')];
+
+    group.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+      if (!button) return;
+      const filter = button.dataset.filter ?? 'all';
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+
+      let shown = 0;
+      for (const item of items) {
+        const areas = item.querySelector<HTMLElement>('[data-areas]')?.dataset.areas?.split(' ') ?? [];
+        const match = filter === 'all' || areas.includes(filter);
+        item.hidden = !match;
+        if (match) {
+          shown += 1;
+          item.querySelector('[data-reveal]')?.classList.remove('reveal-pending');
+        }
+      }
+      if (status) {
+        status.textContent = `Showing ${shown} ${shown === 1 ? 'project' : 'projects'}${filter === 'all' ? '' : ` in ${filter}`}.`;
+      }
+    });
+  }
+</script>

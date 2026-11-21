@@ -1,0 +1,26 @@
+---
+/**
+ * Self-hosted fonts from @fontsource, Latin subset only, font-display: swap.
+ * All three faces are preloaded so they arrive before first paint and never force a re-layout.
+ */
+import serif from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url';
+import sans from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
+import mono from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
+
+const latin =
+  'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
+
+const face = (family: string, url: string, weight: string) =>
+  `@font-face{font-family:'${family}';font-style:normal;font-display:swap;font-weight:${weight};src:url(${url}) format('woff2-variations'),url(${url}) format('woff2');unicode-range:${latin}}`;
+
+const css = [
+  face('Source Serif 4 Variable', serif, '200 900'),
+  face('Source Sans 3 Variable', sans, '200 900'),
+  face('JetBrains Mono Variable', mono, '100 800'),
+].join('');
+---
+
+<link rel="preload" href={serif} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={sans} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={mono} as="font" type="font/woff2" crossorigin />
+<style is:inline set:html={css}></style>

@@ -1,0 +1,90 @@
+---
+import { site } from '../config/site';
+import { profile } from '../data/profile';
+import { isFilled } from '../lib/placeholders';
+import SocialLinks from './SocialLinks.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__id">
+      <p class="site-footer__name">{site.fullName}</p>
+      <p class="site-footer__motto">{profile.motto}</p>
+    </div>
+    <SocialLinks compact />
+    <p class="site-footer__meta">
+      <span>
+        Built with <a href="https://astro.build/">Astro</a> · Hosted on{' '}
+        <a href="https://pages.github.com/">GitHub Pages</a>
+      </span>
+      {isFilled(site.sourceRepoUrl) && (
+        <span>
+          <a href={site.sourceRepoUrl}>Source code</a>
+        </span>
+      )}
+      <span>
+        © {year} {site.fullName}
+      </span>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--space-xl);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    font-size: var(--step--1);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .site-footer__name {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--step-1);
+    font-weight: 600;
+  }
+
+  .site-footer__motto {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .site-footer__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.45em;
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .site-footer__meta > span + span::before {
+    content: '·';
+    margin-right: 0.45em;
+  }
+
+  .site-footer__meta a {
+    color: var(--text-muted);
+  }
+
+  .site-footer__meta a:hover {
+    color: var(--accent);
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer__inner {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+
+    .site-footer__meta {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

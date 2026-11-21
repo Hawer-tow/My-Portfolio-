@@ -1,0 +1,419 @@
+/* Base styles: reset, typography, layout helpers and shared components. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-wrap: break-word;
+}
+
+main {
+  flex: 1;
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Typography */
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 var(--space-s);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--step-4);
+}
+
+h2 {
+  font-size: var(--step-3);
+}
+
+h3 {
+  font-size: var(--step-1);
+}
+
+h4 {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0 0 var(--space-s);
+}
+
+a {
+  color: var(--accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+  transition:
+    color var(--duration) var(--ease),
+    text-decoration-color var(--duration) var(--ease);
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration-color: currentColor;
+}
+
+ul,
+ol {
+  margin: 0 0 var(--space-s);
+  padding-left: 1.25em;
+}
+
+li + li {
+  margin-top: 0.3em;
+}
+
+li::marker {
+  color: var(--text-muted);
+}
+
+strong {
+  font-weight: 600;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+hr {
+  margin: var(--space-l) 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+svg {
+  flex-shrink: 0;
+}
+
+time,
+table,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+dl,
+dd {
+  margin: 0;
+}
+
+figure {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Layout */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--content-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.prose {
+  max-width: var(--measure);
+}
+
+.prose > * + h2 {
+  margin-top: var(--space-xl);
+}
+
+.prose > * + h3 {
+  margin-top: var(--space-l);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2xs);
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Accessibility helpers */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-2xs);
+  left: var(--space-2xs);
+  z-index: 100;
+  padding: var(--space-2xs) var(--space-s);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+  color: var(--accent-contrast);
+}
+
+/* Elements that need JavaScript stay hidden without it. */
+html:not(.js) .js-only {
+  display: none !important;
+}
+
+/* Icons */
+
+.icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+}
+
+/* Buttons and quiet links */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 2.75rem;
+  padding: 0.55em 1.15em;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.btn--primary:hover {
+  background: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
+.btn--secondary {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.btn--secondary:hover {
+  background: var(--surface-2);
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.btn--small {
+  min-height: 2.25rem;
+  padding: 0.35em 0.8em;
+  font-size: var(--step--1);
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-weight: 600;
+}
+
+.link-arrow .icon {
+  transition: transform var(--duration) var(--ease);
+}
+
+.link-arrow:hover .icon {
+  transform: translateX(3px);
+}
+
+/* Tags */
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list li {
+  margin: 0;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1em 0.55em;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Cards */
+
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition:
+    box-shadow var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: color-mix(in srgb, var(--border) 60%, var(--border-strong));
+}
+
+/*
+ * Sections below the fold are laid out only when they come near the viewport.
+ * `auto` in contain-intrinsic-size remembers the real height once rendered.
+ */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+@media print {
+  .defer-render {
+    content-visibility: visible;
+  }
+}
+
+/* Placeholder text that the owner still needs to fill in. */
+.placeholder-note {
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+
+/*
+ * Scroll-into-view motion (see src/scripts/reveal.ts). Only elements that start off screen
+ * are ever hidden. Off without JavaScript, under reduced motion and in print.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal].reveal-pending {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  [data-reveal].reveal-in {
+    transition:
+      opacity var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

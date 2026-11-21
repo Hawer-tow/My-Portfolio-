@@ -1,0 +1,81 @@
+---
+import Icon from './Icon.astro';
+---
+
+<button class="theme-toggle js-only" type="button" aria-pressed="false" title="Dark theme" data-theme-toggle>
+  <span class="visually-hidden">Dark theme</span>
+  <Icon name="moon" class="theme-toggle__moon" size={20} />
+  <Icon name="sun" class="theme-toggle__sun" size={20} />
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition:
+      background-color var(--duration) var(--ease),
+      border-color var(--duration) var(--ease);
+  }
+
+  .theme-toggle:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  .theme-toggle :global(.icon) {
+    grid-area: 1 / 1;
+  }
+
+  /* Show the moon in light mode (switch to dark) and the sun when dark is on. */
+  .theme-toggle[aria-pressed='true'] :global(.theme-toggle__moon),
+  .theme-toggle[aria-pressed='false'] :global(.theme-toggle__sun) {
+    visibility: hidden;
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const systemDark = matchMedia('(prefers-color-scheme: dark)');
+
+  const current = (): 'light' | 'dark' => {
+    const chosen = root.getAttribute('data-theme');
+    if (chosen === 'light' || chosen === 'dark') return chosen;
+    return systemDark.matches ? 'dark' : 'light';
+  };
+
+  function sync() {
+    const theme = current();
+    button?.setAttribute('aria-pressed', String(theme === 'dark'));
+    button?.setAttribute('title', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    // Keep the browser UI colour in step with an explicit choice.
+    if (root.hasAttribute('data-theme')) {
+      const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+      document
+        .querySelectorAll('meta[name="theme-color"]')
+        .forEach((meta) => meta.setAttribute('content', bg));
+    }
+  }
+
+  button?.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // Storage can be unavailable (private mode); the choice then lasts for this page only.
+    }
+    sync();
+  });
+
+  systemDark.addEventListener('change', sync);
+  sync();
+</script>

@@ -1,0 +1,22 @@
+# Build output and caches
+dist/
+.astro/
+node_modules/
+
+# Test and audit reports
+.lighthouseci/
+playwright-report/
+test-results/
+
+# Environment and editor files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+*.log
+
+# Raw screenshots waiting to be checked and placed (never published)
+incoming-screenshots/

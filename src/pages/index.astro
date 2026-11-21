@@ -1,0 +1,48 @@
+---
+import { getImage } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Projects from '../components/Projects.astro';
+import Skills from '../components/Skills.astro';
+import Section from '../components/Section.astro';
+import Timeline from '../components/Timeline.astro';
+import Education from '../components/Education.astro';
+import Contact from '../components/Contact.astro';
+import { site } from '../config/site';
+import { experience } from '../data/experience';
+import { resolveImage } from '../lib/images';
+import { isFilled } from '../lib/placeholders';
+import { getSocialLinks } from '../lib/socials';
+import { absoluteUrl } from '../lib/url';
+
+const portrait = await getImage({ src: await resolveImage(site.profilePhoto), width: 512, format: 'jpg' });
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.fullName,
+  jobTitle: site.roleTitle,
+  url: absoluteUrl('/'),
+  image: new URL(portrait.src, import.meta.env.SITE).href,
+  ...(isFilled(site.email) && { email: `mailto:${site.email}` }),
+  address: { '@type': 'PostalAddress', addressLocality: site.location },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: site.universityName },
+  knowsLanguage: site.languages,
+  sameAs: getSocialLinks().map((link) => link.href),
+};
+---
+
+<BaseLayout type="profile" jsonLd={person}>
+  <Hero />
+  <About />
+  <Projects />
+  <Skills />
+  {site.features.showExperience && (
+    <Section id="experience" title="Experience">
+      <Timeline entries={experience} />
+    </Section>
+  )}
+  {site.features.showEducation && <Education />}
+  <Contact />
+</BaseLayout>

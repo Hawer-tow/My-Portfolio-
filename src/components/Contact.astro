@@ -1,0 +1,106 @@
+---
+import { site } from '../config/site';
+import { profile } from '../data/profile';
+import { isFilled } from '../lib/placeholders';
+import { getSocialLinks } from '../lib/socials';
+import ContactForm from './ContactForm.astro';
+import CopyEmail from './CopyEmail.astro';
+import Icon from './Icon.astro';
+import Section from './Section.astro';
+import SocialLinks from './SocialLinks.astro';
+
+const showPhone = site.features.showPhone && isFilled(site.phone);
+const showForm = site.features.showContactForm && isFilled(site.contactFormEndpoint);
+const hasSocials = getSocialLinks().length > 0;
+---
+
+<Section id="contact" title="Contact" intro={profile.contactIntro}>
+  <div class="contact">
+    <div class="contact__details" data-reveal>
+      <CopyEmail email={site.email} />
+
+      {showPhone && (
+        <p class="contact__line">
+          <Icon name="phone" />
+          <a href={`tel:${site.phone.replace(/\s+/g, '')}`}>{site.phone}</a>
+        </p>
+      )}
+
+      <p class="contact__line muted">
+        <Icon name="map-pin" />
+        {site.location}
+      </p>
+
+      {hasSocials && (
+        <div class="contact__socials">
+          <h3 class="contact__heading">Elsewhere</h3>
+          <SocialLinks />
+        </div>
+      )}
+
+      <p class="contact__line muted">
+        <Icon name="clock" />
+        {profile.responseTime}
+      </p>
+    </div>
+
+    <div class="contact__action card" data-reveal>
+      {showForm ? (
+        <>
+          <h3 class="contact__heading">Send a message</h3>
+          <ContactForm endpoint={site.contactFormEndpoint} />
+        </>
+      ) : (
+        <>
+          <h3 class="contact__heading">Write to me</h3>
+          <p>The quickest way to reach me is email. Tell me a little about the role or project.</p>
+          <a class="btn btn--primary" href={`mailto:${site.email}`}>
+            <Icon name="mail" />
+            Send an email
+          </a>
+        </>
+      )}
+    </div>
+  </div>
+</Section>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    align-items: start;
+  }
+
+  .contact__details {
+    display: grid;
+    gap: var(--space-s);
+  }
+
+  .contact__line {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin: 0;
+  }
+
+  .contact__heading {
+    margin-bottom: var(--space-2xs);
+    font-size: var(--step-1);
+  }
+
+  .contact__action {
+    padding: var(--space-m);
+  }
+
+  .contact__action:hover {
+    box-shadow: none;
+  }
+
+  @media (min-width: 60rem) {
+    .contact {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2xl);
+    }
+  }
+</style>

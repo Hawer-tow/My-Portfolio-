@@ -1,0 +1,119 @@
+---
+import { site } from '../config/site';
+import { currentlyLearning, skillGroups } from '../data/skills';
+import { getProjects, projectHref, projectShortTitle } from '../lib/projects';
+import Section from './Section.astro';
+
+// Resolve "usedIn" ids to links; ids of unpublished projects are dropped.
+const projects = await getProjects();
+const byId = new Map(projects.map((project) => [project.id, project]));
+const evidence = (ids: string[] = []) =>
+  ids.flatMap((id) => {
+    const project = byId.get(id);
+    return project ? [{ href: projectHref(project), label: projectShortTitle(project) }] : [];
+  });
+---
+
+<Section
+  id="skills"
+  title="Skills"
+  intro="Grouped by area. Where a skill links to a project, that project is the evidence."
+>
+  <div class="skills">
+    {skillGroups.map((group) => (
+      <section class="skill-group" aria-labelledby={`skills-${group.id}`} data-reveal>
+        <h3 id={`skills-${group.id}`} class="skill-group__title">
+          {group.title}
+        </h3>
+        <ul class="skill-group__list">
+          {group.skills.map((skill) => {
+            const links = evidence(skill.usedIn);
+            return (
+              <li class="skill">
+                <span class="skill__name">
+                  {skill.name}
+                  {skill.detail && <span class="skill__detail"> ({skill.detail})</span>}
+                </span>
+                {links.length > 0 && (
+                  <span class="skill__evidence">
+                    used in{' '}
+                    {links.map((link, i) => (
+                      <>
+                        {i > 0 && ', '}
+                        <a href={link.href}>{link.label}</a>
+                      </>
+                    ))}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))}
+  </div>
+
+  {site.features.showCurrentlyLearning && currentlyLearning.length > 0 && (
+    <section class="learning" aria-labelledby="skills-learning" data-reveal>
+      <h3 id="skills-learning" class="skill-group__title">
+        Currently learning
+      </h3>
+      <ul class="tag-list">
+        {currentlyLearning.map((item) => (
+          <li>
+            <span class="tag">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Section>
+
+<style>
+  .skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+    gap: var(--space-l) var(--space-xl);
+  }
+
+  .skill-group__title {
+    margin-bottom: var(--space-xs);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--step-1);
+  }
+
+  .skill-group__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .skill {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 0 var(--space-s);
+    padding-block: 0.35rem;
+  }
+
+  .skill + .skill {
+    margin-top: 0;
+    border-top: 1px dotted var(--border);
+  }
+
+  .skill__detail {
+    color: var(--text-muted);
+  }
+
+  .skill__evidence {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .learning {
+    max-width: var(--measure);
+    margin-top: var(--space-xl);
+  }
+</style>

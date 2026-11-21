@@ -1,0 +1,106 @@
+---
+# Written from the project's own write-up (incoming-screenshots/dateroem-batch-2/dateroem-ai.txt).
+# TODO(owner): add 4–6 screenshots with sample data once a demo copy of the app's data exists
+#   (the real data folder holds the owner's records). Until then the cover is a title card.
+title: Dateroem AI
+shortTitle: Dateroem AI
+summary: >-
+  A Windows desktop app that helps a Kenyan timber business decide where to source trees, by
+  bringing its own buying records together with public data on tree species, climate, terrain,
+  roads and land cover.
+role: Sole developer, from planning to build, using AI-assisted coding (Claude Code)
+period: November 2026
+team: Solo, for the business owner
+status: Working first version in use by the owner; predictions are the next phase
+featured: false
+draft: false
+order: 2
+areas: [Desktop, Data]
+stack:
+  - Python 3.13
+  - PySide6 (Qt)
+  - SQLite
+  - pandas
+  - ONNX Runtime
+  - OpenStreetMap
+stackGroups:
+  - label: Desktop app
+    items: [Python 3.13, PySide6 (Qt), SQLite, pandas, numpy]
+  - label: Image matching
+    items: [ONNX Runtime, DINOv2-small (runs on the computer)]
+  - label: Maps and geography
+    items: [OpenStreetMap (Geofabrik extracts), osmium, geoBoundaries, QLever (SPARQL)]
+  - label: Climate and land
+    items: [NASA POWER, CHIRPS, SoilGrids, AWS Terrain Tiles]
+  - label: Species data
+    items: [GBIF]
+cover: ../../assets/images/projects/dateroem-ai/cover.jpg
+coverAlt: Title card reading Dateroem AI, timber intelligence for sourcing decisions, over a stylised contour map.
+challenges:
+  - title: Unreliable public map servers
+    problem: >-
+      Competitor searches depended on the public Overpass servers, and at times every one of
+      them timed out.
+    approach: >-
+      I moved the searches to QLever, which runs SPARQL over the whole OpenStreetMap planet, and
+      split them into small steps after a combined query took 106 seconds. Overpass stays as the
+      fallback.
+    outcome: Competitor searches keep working when the usual map servers are down.
+  - title: A smooth map on modest hardware
+    problem: Large maps with many points were slow to draw on an ordinary laptop.
+    approach: >-
+      Map tiles are decoded on a background thread, the level above stands in while zooming,
+      and points are drawn once per zoom level instead of on every frame.
+    outcome: Drawing a frame went from 215 ms to 5 ms.
+  - title: Data the owner can trust
+    problem: >-
+      Facts about trees only help if they are right, and the business’s farm records are
+      private.
+    approach: >-
+      Every fact carries a source and needs the owner’s approval. Only research-grade, openly
+      licensed photos were added to the tree book, each checked by eye, and pressed herbarium
+      specimens are shown but never used for matching.
+    outcome: The tree book can be trusted, and farm-level data never leaves the laptop.
+results:
+  - label: Timber species in the tree book
+    value: '43'
+  - label: Countries with offline base maps
+    value: '12'
+  - label: Map frame time
+    value: 215 → 5 ms
+  - label: Built in
+    value: 4 days
+# TODO(owner): add 3–5 lessons in your own words.
+learned: []
+links:
+  sourceOnRequest: true
+---
+
+## Problem and context
+
+A timber business decides where to buy trees largely from experience. Dateroem AI brings the business’s own buying records together with public data on tree species, climate, terrain, roads and land cover, so those decisions can rest on evidence.
+
+## Goals
+
+- See where each timber species grows, and how areas compare on climate, soil, slope, roads and water.
+- Record every farm visit, including the farms the business did not buy from.
+- Later, once several months of real buying trips exist: suggest what to pay, and which areas give the best timber.
+
+## My role
+
+I was the sole developer: planning, design, data sourcing and the build, using AI-assisted coding with Claude Code. I planned the app on 6 November 2026 and built it from 7 to 10 November: 26 commits and about 12,400 lines of Python.
+
+## How it works
+
+The app is written in Python with PySide6 and shares the sign-in, theme and widgets of the company’s desktop admin console. A privacy-filtered export from the live sales system feeds its local SQLite store. Public datasets are downloaded and processed on the computer, and the image model runs locally with ONNX Runtime, so nothing is sent to an online AI service.
+
+## Key features
+
+- **Tree book.** 43 East and Central African timber species. Every fact carries a source and a date, and goes through an approve, correct or reject review queue. Kiswahili and Kikuyu names are searchable.
+- **Where trees grow.** Maps from GBIF occurrence records, filtered to clean records, with the licence kept for each record.
+- **Offline base maps.** Country maps for 12 countries, drawn on the computer from OpenStreetMap extracts and updated only on request.
+- **Area tools.** County, constituency and ward outlines; climate summaries (NASA POWER corrected for altitude, CHIRPS rainfall, Köppen class); soil, slope and land-cover layers; and the distance to tarmac, main roads and water.
+- **Which tree is it?** Matches a new photo against the owner’s own verified tree photos with a local image model, and says how sure it is.
+- **Data entry.** Farm visits, grades, board feet and prices, so the business records the farms it did not buy from as well.
+- **Competitor map.** Sawmills, timber yards and furniture shops from public OpenStreetMap data, with the owner’s corrections.
+- **Forest offices and resources.** A finder for Kenya Forest Service conservancies and stations, and a page showing the app’s memory and disk use.

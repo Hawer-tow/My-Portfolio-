@@ -1,0 +1,357 @@
+---
+/**
+ * Dateroem architecture as an accessible inline SVG.
+ * Two drawings from the same data: a wide one for larger screens and a narrow one for phones,
+ * so the text stays readable. Only one is displayed (and exposed to assistive tech) at a time.
+ * Facts come from the project brief; do not add server addresses or numbers that are not public.
+ */
+
+interface NodeText {
+  title: string;
+  lines: string[];
+}
+
+interface DiagramNode {
+  wide: NodeText;
+  narrow: NodeText;
+  emphasis?: boolean;
+}
+
+interface Tier {
+  label: string[];
+  nodes: DiagramNode[];
+}
+
+const tiers: Tier[] = [
+  {
+    label: ['Clients'],
+    nodes: [
+      {
+        wide: { title: 'Customer website', lines: ['React 18 · Vite', 'for customers'] },
+        narrow: { title: 'Website', lines: ['React · Vite', 'Customers'] },
+      },
+      {
+        wide: { title: 'Staff app', lines: ['Android · Kotlin · Compose', 'for field staff'] },
+        narrow: { title: 'Staff app', lines: ['Android · Kotlin', 'Field staff'] },
+      },
+      {
+        wide: { title: 'Admin console', lines: ['Desktop · PySide6 (Qt 6)', 'for administrators'] },
+        narrow: { title: 'Admin console', lines: ['PySide6 · Qt 6', 'Administrators'] },
+      },
+    ],
+  },
+  {
+    label: ['Edge'],
+    nodes: [
+      {
+        wide: {
+          title: 'Caddy reverse proxy',
+          lines: [
+            'Routes  /   /mobile-api/   /admin-api/',
+            'Friendly maintenance page when a service is down',
+          ],
+        },
+        narrow: { title: 'Caddy reverse proxy', lines: ['/  /mobile-api/  /admin-api/', 'Maintenance page'] },
+      },
+    ],
+  },
+  {
+    label: ['Backends for', 'frontends'],
+    nodes: [
+      {
+        wide: { title: 'Website BFF', lines: ['FastAPI · Python'] },
+        narrow: { title: 'Web BFF', lines: ['FastAPI'] },
+      },
+      {
+        wide: { title: 'Mobile BFF', lines: ['FastAPI · Python'] },
+        narrow: { title: 'Mobile BFF', lines: ['FastAPI'] },
+      },
+      {
+        wide: { title: 'Admin BFF', lines: ['FastAPI · Python'] },
+        narrow: { title: 'Admin BFF', lines: ['FastAPI'] },
+      },
+    ],
+  },
+  {
+    label: ['Core'],
+    nodes: [
+      {
+        emphasis: true,
+        wide: {
+          title: 'Core REST API',
+          lines: [
+            'Spring Boot · Java 17 · about 170 endpoints',
+            'Business rules, authentication, payments, SMS, email, AI',
+          ],
+        },
+        narrow: { title: 'Core REST API', lines: ['Spring Boot · Java 17', 'about 170 endpoints'] },
+      },
+    ],
+  },
+  {
+    label: ['Data and', 'services'],
+    nodes: [
+      {
+        wide: { title: 'MySQL 8', lines: ['about 40 tables', '30+ versioned migrations'] },
+        narrow: { title: 'MySQL 8', lines: ['about 40 tables', '30+ migrations'] },
+      },
+      {
+        wide: {
+          title: 'External services',
+          lines: ['M-Pesa Daraja · Africa’s Talking SMS', 'Google Identity · Gmail SMTP · Claude API'],
+        },
+        narrow: { title: 'External services', lines: ['M-Pesa · SMS · Google', 'Gmail · Claude API'] },
+      },
+    ],
+  },
+];
+
+type Variant = 'wide' | 'narrow';
+
+const settings = {
+  wide: {
+    width: 880,
+    labelCol: 150,
+    gap: 20,
+    rowGap: 34,
+    labelHeight: 0,
+    pad: 16,
+    title: 15,
+    line: 12.5,
+    lineHeight: 17,
+  },
+  narrow: {
+    width: 340,
+    labelCol: 0,
+    gap: 6,
+    rowGap: 24,
+    labelHeight: 20,
+    pad: 12,
+    title: 12.5,
+    line: 10.5,
+    lineHeight: 14,
+  },
+} as const;
+
+function layout(variant: Variant) {
+  const s = settings[variant];
+  const areaX = s.labelCol;
+  const areaW = s.width - s.labelCol;
+  let y = 1;
+  const rows = tiers.map((tier) => {
+    const maxLines = Math.max(...tier.nodes.map((n) => n[variant].lines.length));
+    const labelY = y;
+    y += s.labelHeight;
+    const height = s.pad + s.title + maxLines * s.lineHeight + s.pad * 0.75;
+    const width = (areaW - (tier.nodes.length - 1) * s.gap) / tier.nodes.length;
+    const nodes = tier.nodes.map((node, i) => ({
+      ...node[variant],
+      emphasis: node.emphasis ?? false,
+      x: areaX + i * (width + s.gap),
+      y,
+      width,
+      height,
+      cx: areaX + i * (width + s.gap) + width / 2,
+    }));
+    const row = { label: tier.label, labelY, y, height, nodes };
+    y += height + s.rowGap;
+    return row;
+  });
+
+  // Arrows run straight down, at the centre of each node in whichever row has more nodes.
+  const arrows: { x: number; y1: number; y2: number }[] = [];
+  rows.slice(0, -1).forEach((upper, i) => {
+    const lower = rows[i + 1]!;
+    const guide = upper.nodes.length >= lower.nodes.length ? upper.nodes : lower.nodes;
+    for (const node of guide) {
+      arrows.push({ x: node.cx, y1: upper.y + upper.height, y2: lower.y - 3 });
+    }
+  });
+
+  return { ...s, rows, arrows, height: Math.ceil(y - s.rowGap + 2) };
+}
+
+const drawings = (['wide', 'narrow'] as const).map((variant) => ({ variant, ...layout(variant) }));
+
+const description =
+  'Five layers. Clients: a React customer website, an Android staff app and a PySide6 desktop admin console. ' +
+  'All three connect through a Caddy reverse proxy, which routes the paths /, /mobile-api/ and /admin-api/ ' +
+  'to three FastAPI backends-for-frontends, one per client. Each backend-for-frontend calls the Spring Boot core REST API, ' +
+  'which stores data in MySQL 8 and connects to external services: M-Pesa Daraja, Africa’s Talking SMS, Google Identity, Gmail SMTP and the Claude API.';
+---
+
+<figure class="arch" aria-labelledby="arch-caption">
+  {drawings.map((d) => (
+    <svg
+      class={`arch__svg arch__svg--${d.variant}`}
+      viewBox={`0 0 ${d.width} ${d.height}`}
+      role="img"
+      aria-labelledby={`arch-title-${d.variant} arch-desc-${d.variant}`}
+      focusable="false"
+    >
+      <title id={`arch-title-${d.variant}`}>Dateroem system architecture</title>
+      <desc id={`arch-desc-${d.variant}`}>{description}</desc>
+      <defs>
+        <marker
+          id={`arch-arrow-${d.variant}`}
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M0 0 10 5 0 10z" class="arch__arrowhead" />
+        </marker>
+      </defs>
+
+      {d.arrows.map((a) => (
+        <line
+          class="arch__arrow"
+          x1={a.x}
+          y1={a.y1}
+          x2={a.x}
+          y2={a.y2}
+          marker-end={`url(#arch-arrow-${d.variant})`}
+        />
+      ))}
+
+      {d.rows.map((row) => (
+        <g>
+          {d.labelCol > 0 ? (
+            <text class="arch__tier" x="0" y={row.y + row.height / 2 - (row.label.length - 1) * 7 + 4}>
+              {row.label.map((part, i) => (
+                <tspan x="0" dy={i === 0 ? 0 : 14}>
+                  {part}
+                </tspan>
+              ))}
+            </text>
+          ) : (
+            <text class="arch__tier arch__tier--narrow" x="0" y={row.labelY + 13}>
+              {row.label.join(' ')}
+            </text>
+          )}
+          {row.nodes.map((node) => (
+            <g class:list={['arch__node', { 'arch__node--core': node.emphasis }]}>
+              <rect x={node.x} y={node.y} width={node.width} height={node.height} rx="6" />
+              <text
+                class="arch__title"
+                x={node.cx}
+                y={node.y + d.pad + d.title * 0.8}
+                text-anchor="middle"
+                font-size={d.title}
+              >
+                {node.title}
+              </text>
+              {node.lines.map((line, i) => (
+                <text
+                  class="arch__line"
+                  x={node.cx}
+                  y={node.y + d.pad + d.title + (i + 1) * d.lineHeight - 2}
+                  text-anchor="middle"
+                  font-size={d.line}
+                >
+                  {line}
+                </text>
+              ))}
+            </g>
+          ))}
+        </g>
+      ))}
+    </svg>
+  ))}
+  <figcaption id="arch-caption" class="arch__caption">
+    System architecture: three client apps, each with its own backend-for-frontend behind one reverse proxy,
+    sharing a single Java core API.
+  </figcaption>
+</figure>
+
+<style>
+  .arch {
+    margin-block: var(--space-l);
+    padding: var(--space-m);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .arch__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .arch__svg--narrow {
+    display: none;
+  }
+
+  @media (max-width: 40rem) {
+    .arch {
+      padding: var(--space-s) var(--space-2xs);
+    }
+
+    .arch__svg--wide {
+      display: none;
+    }
+
+    .arch__svg--narrow {
+      display: block;
+    }
+  }
+
+  .arch__node rect {
+    fill: var(--surface-2);
+    stroke: var(--border-strong);
+    stroke-width: 1;
+  }
+
+  .arch__node--core rect {
+    fill: var(--accent-tint);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .arch__title {
+    fill: var(--text);
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .arch__line {
+    fill: var(--text-muted);
+    font-family: var(--font-sans);
+  }
+
+  .arch__tier {
+    fill: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* On phones the labels sit between rows; a halo keeps them clear of the arrows. */
+  .arch__tier--narrow {
+    font-size: 10px;
+    paint-order: stroke;
+    stroke: var(--surface);
+    stroke-width: 6px;
+    stroke-linejoin: round;
+  }
+
+  .arch__arrow {
+    stroke: var(--text-muted);
+    stroke-width: 1.25;
+  }
+
+  .arch__arrowhead {
+    fill: var(--text-muted);
+  }
+
+  .arch__caption {
+    margin-top: var(--space-s);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+</style>

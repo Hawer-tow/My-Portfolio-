@@ -1,0 +1,13 @@
+dist/
+.astro/
+node_modules/
+.lighthouseci/
+playwright-report/
+test-results/
+public/
+package-lock.json
+# Prettier's MDX support predates MDX 3 and can break JSX in project files.
+*.mdx
+incoming-screenshots/
+# Editor workspace files
+*.code-workspace

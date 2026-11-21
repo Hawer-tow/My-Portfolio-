@@ -1,0 +1,69 @@
+---
+import { site } from '../config/site';
+import { absoluteUrl, withBase } from '../lib/url';
+
+export interface SeoProps {
+  /** Page title without the site name. Omit on the home page. */
+  title?: string;
+  description?: string;
+  /** Absolute or site-relative image URL for link previews (1200 × 630). */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
+  /** Structured data, serialised as JSON-LD. */
+  jsonLd?: Record<string, unknown>;
+}
+
+type Props = SeoProps;
+
+const {
+  title,
+  description = site.seo.description,
+  image = site.seo.ogImage,
+  imageAlt = site.seo.ogImageAlt,
+  type = 'website',
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${site.fullName}` : `${site.fullName} · ${site.roleTitle}`;
+// Astro.url.pathname already includes the base path.
+const canonical = new URL(Astro.url.pathname, import.meta.env.SITE).href;
+const imageUrl = /^https?:/.test(image) ? image : absoluteUrl(image);
+const isDefaultImage = image === site.seo.ogImage;
+// Escape "<" so the JSON can never close the script element early.
+const structuredData = jsonLd ? JSON.stringify(jsonLd).replace(/</g, '\\u003c') : undefined;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.fullName} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={site.seo.locale} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:alt" content={imageAlt} />
+{isDefaultImage && <meta property="og:image:width" content="1200" />}
+{isDefaultImage && <meta property="og:image:height" content="630" />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+<meta name="twitter:image:alt" content={imageAlt} />
+
+<link rel="icon" href={withBase('/favicon.ico')} sizes="32x32" />
+<link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+<link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
+<link rel="manifest" href={withBase('/manifest.webmanifest')} />
+<meta name="theme-color" content="#faf8f4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)" />
+<link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+
+{structuredData && <script is:inline type="application/ld+json" set:html={structuredData}></script>}

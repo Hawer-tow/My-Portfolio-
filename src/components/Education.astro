@@ -1,0 +1,176 @@
+---
+import { site } from '../config/site';
+import { certifications, education } from '../data/education';
+import { isFilled } from '../lib/placeholders';
+import Icon from './Icon.astro';
+import Section from './Section.astro';
+---
+
+<Section id="education" title="Education">
+  <div class="education">
+    <article class="degree card" aria-labelledby="degree-title" data-reveal>
+      <p class="eyebrow">Degree</p>
+      <h3 id="degree-title" class="degree__title">
+        {education.degree}
+      </h3>
+      <p class="degree__school">{education.university}</p>
+      <p class="degree__meta tabular">Expected graduation: {education.graduation}</p>
+      {isFilled(education.standing) && <p class="degree__meta">{education.standing}</p>}
+    </article>
+
+    <div class="education__details">
+      <section aria-labelledby="coursework-title" data-reveal>
+        <h3 id="coursework-title" class="education__heading">
+          Relevant coursework
+        </h3>
+        <ul class="coursework">
+          {education.coursework.map((unit) => (
+            <li>{unit}</li>
+          ))}
+        </ul>
+      </section>
+
+      {education.academicProjects.length > 0 && (
+        <section aria-labelledby="academic-projects-title" data-reveal>
+          <h3 id="academic-projects-title" class="education__heading">
+            Academic projects
+          </h3>
+          <ul class="plain-list">
+            {education.academicProjects.map((item) => (
+              <li>
+                <strong>{item.title}</strong>
+                <span class="muted"> · {item.summary}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {education.awards.length > 0 && (
+        <section aria-labelledby="awards-title" data-reveal>
+          <h3 id="awards-title" class="education__heading">
+            Awards
+          </h3>
+          <ul class="plain-list">
+            {education.awards.map((award) => (
+              <li>
+                <strong>{award.title}</strong>
+                <span class="muted tabular"> · {award.year}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {site.features.showCertifications && certifications.length > 0 && (
+        <section aria-labelledby="certifications-title" data-reveal>
+          <h3 id="certifications-title" class="education__heading">
+            Certifications
+          </h3>
+          <ul class="plain-list">
+            {certifications.map((cert) => (
+              <li class="cert">
+                <strong>{cert.name}</strong>
+                <span class="muted">
+                  {' '}
+                  · {isFilled(cert.issuerUrl) ? (
+                    <a href={cert.issuerUrl}>{cert.issuer}</a>
+                  ) : (
+                    cert.issuer
+                  )} · <span class="tabular">{cert.date}</span>
+                  {isFilled(cert.reference) && <span> · ref. {cert.reference}</span>}
+                </span>
+                {isFilled(cert.url) && (
+                  <>
+                    {' '}
+                    <a href={cert.url} class="cert__link">
+                      View credential
+                      <span class="visually-hidden"> for {cert.name}</span>
+                      <Icon name="external-link" size={14} />
+                    </a>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  </div>
+</Section>
+
+<style>
+  .education {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-l);
+    align-items: start;
+  }
+
+  .degree {
+    padding: var(--space-m);
+  }
+
+  .degree:hover {
+    box-shadow: none;
+  }
+
+  .degree__title {
+    margin-bottom: var(--space-3xs);
+    font-size: var(--step-2);
+  }
+
+  .degree__school {
+    margin-bottom: var(--space-xs);
+    font-weight: 600;
+  }
+
+  .degree__meta {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .education__details {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .education__heading {
+    margin-bottom: var(--space-xs);
+    font-size: var(--step-1);
+  }
+
+  .coursework {
+    columns: 2 14rem;
+    column-gap: var(--space-l);
+    margin: 0;
+  }
+
+  .coursework li {
+    break-inside: avoid;
+  }
+
+  .plain-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .plain-list li + li {
+    margin-top: var(--space-2xs);
+  }
+
+  .cert__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font-size: var(--step--1);
+  }
+
+  @media (min-width: 60rem) {
+    .education {
+      grid-template-columns: 22rem minmax(0, 1fr);
+      gap: var(--space-2xl);
+    }
+  }
+</style>

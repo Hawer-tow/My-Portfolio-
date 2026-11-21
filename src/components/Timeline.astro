@@ -1,0 +1,90 @@
+---
+import type { ExperienceEntry } from '../data/experience';
+import { withBase } from '../lib/url';
+import Icon from './Icon.astro';
+
+interface Props {
+  entries: ExperienceEntry[];
+}
+
+const entries = Astro.props.entries.filter((entry) => !entry.hidden);
+---
+
+<ol class="timeline">
+  {entries.map((entry) => (
+    <li class="timeline__item" data-reveal>
+      <article>
+        <p class="timeline__dates tabular">{entry.dates}</p>
+        <h3 class="timeline__role">{entry.role}</h3>
+        <p class="timeline__org">
+          {entry.organisation}
+          {entry.location && <span class="muted"> · {entry.location}</span>}
+        </p>
+        <ul class="timeline__highlights">
+          {entry.highlights.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+        {entry.link && (
+          <a class="link-arrow" href={withBase(entry.link.href)}>
+            {entry.link.label}
+            <Icon name="arrow-right" size={16} />
+          </a>
+        )}
+      </article>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .timeline {
+    max-width: 52rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .timeline__item {
+    position: relative;
+    margin: 0;
+    padding: 0 0 var(--space-l) var(--space-l);
+    border-left: 1px solid var(--border-strong);
+  }
+
+  .timeline__item:last-child {
+    padding-bottom: 0;
+    border-left-color: transparent;
+  }
+
+  .timeline__item::before {
+    content: '';
+    position: absolute;
+    top: 0.45rem;
+    left: -0.4rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+
+  .timeline__dates {
+    margin: 0 0 var(--space-3xs);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .timeline__role {
+    margin-bottom: var(--space-3xs);
+  }
+
+  .timeline__org {
+    margin-bottom: var(--space-xs);
+    font-weight: 600;
+  }
+
+  .timeline__highlights {
+    margin-bottom: var(--space-xs);
+  }
+</style>

@@ -1,0 +1,368 @@
+---
+/**
+ * HTML CV, built from the same data files as the home page.
+ * Print it (or run `npm run cv:pdf`) for a clean A4 PDF.
+ */
+import PrintLayout from '../layouts/PrintLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config/site';
+import { profile } from '../data/profile';
+import { currentlyLearning, skillGroups } from '../data/skills';
+import { experience } from '../data/experience';
+import { certifications, education } from '../data/education';
+import { isFilled } from '../lib/placeholders';
+import { getProjects, projectHref } from '../lib/projects';
+import { getSocialLinks } from '../lib/socials';
+import { absoluteUrl, withBase } from '../lib/url';
+
+const projects = await getProjects();
+const roles = experience.filter((entry) => !entry.hidden);
+const socials = getSocialLinks().filter((link) => ['github', 'linkedin', 'blog'].includes(link.id));
+const showPhone = site.features.showPhone && isFilled(site.phone);
+// The site address appears on the CV only once it is a public one (not a local build).
+const siteHost = absoluteUrl('/')
+  .replace(/^https?:\/\//, '')
+  .replace(/\/$/, '');
+const showSiteHost = !/^(localhost|127\.0\.0\.1)(:|$)/.test(siteHost);
+---
+
+<PrintLayout
+  title="CV"
+  description={`Curriculum vitae of ${site.fullName}: skills, projects, experience and education.`}
+  current="cv"
+>
+  <div class="cv-toolbar" slot="toolbar">
+    <a class="btn btn--primary" href={withBase(site.cvPdfPath)} download>
+      <Icon name="download" />
+      Download PDF
+    </a>
+    <button type="button" class="btn btn--secondary js-only" data-print>
+      <Icon name="printer" />
+      Print
+    </button>
+  </div>
+
+  <article class="cv" aria-labelledby="cv-name">
+    <header class="cv__header">
+      <h1 id="cv-name" class="cv__name">
+        {site.fullName}
+      </h1>
+      <p class="cv__role">{site.roleTitle}</p>
+      <ul class="cv__contact">
+        <li>
+          <a class="print-no-url" href={`mailto:${site.email}`}>
+            {site.email}
+          </a>
+        </li>
+        {showPhone && <li>{site.phone}</li>}
+        <li>{site.location}</li>
+        {showSiteHost && (
+          <li>
+            <a class="print-no-url" href={absoluteUrl('/')}>
+              {siteHost}
+            </a>
+          </li>
+        )}
+        {socials.map((link) => (
+          <li>
+            <a class="print-no-url" href={link.href}>
+              {link.href.replace(/^https?:\/\/(www\.)?/, '')}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </header>
+
+    <section class="cv__section" aria-labelledby="cv-profile">
+      <h2 id="cv-profile">Profile</h2>
+      <p>{profile.heroSummary}</p>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-skills">
+      <h2 id="cv-skills">Skills</h2>
+      <dl class="cv__skills">
+        {skillGroups.map((group) => (
+          <div>
+            <dt>{group.title}</dt>
+            <dd>{group.skills.map((skill) => skill.name).join(' · ')}</dd>
+          </div>
+        ))}
+        {site.features.showCurrentlyLearning && currentlyLearning.length > 0 && (
+          <div>
+            <dt>Currently learning</dt>
+            <dd>{currentlyLearning.join(' · ')}</dd>
+          </div>
+        )}
+      </dl>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-projects">
+      <h2 id="cv-projects">Projects</h2>
+      {projects.map((project) => (
+        <div class="cv__entry">
+          <div class="cv__entry-head">
+            <h3>
+              <a href={projectHref(project)}>{project.data.title}</a>
+            </h3>
+            <p class="cv__when">{project.data.period}</p>
+          </div>
+          <p class="cv__sub">{project.data.role}</p>
+          <p>{project.data.summary}</p>
+          <p class="cv__stack">{project.data.stack.join(' · ')}</p>
+        </div>
+      ))}
+    </section>
+
+    {site.features.showExperience && roles.length > 0 && (
+      <section class="cv__section" aria-labelledby="cv-experience">
+        <h2 id="cv-experience">Experience</h2>
+        {roles.map((entry) => (
+          <div class="cv__entry">
+            <div class="cv__entry-head">
+              <h3>{entry.role}</h3>
+              <p class="cv__when">{entry.dates}</p>
+            </div>
+            <p class="cv__sub">{entry.organisation}</p>
+            <ul>
+              {entry.highlights.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    )}
+
+    <section class="cv__section" aria-labelledby="cv-education">
+      <h2 id="cv-education">Education</h2>
+      <div class="cv__entry">
+        <div class="cv__entry-head">
+          <h3>{education.degree}</h3>
+          <p class="cv__when">Expected {education.graduation}</p>
+        </div>
+        <p class="cv__sub">{education.university}</p>
+        {isFilled(education.standing) && <p>{education.standing}</p>}
+        <p>
+          <strong>Relevant coursework:</strong> {education.coursework.join(', ')}.
+        </p>
+        {education.academicProjects.length > 0 && (
+          <p>
+            <strong>Academic projects:</strong>{' '}
+            {education.academicProjects.map((item) => `${item.title}: ${item.summary}`).join(' ')}
+          </p>
+        )}
+        {education.awards.length > 0 && (
+          <p>
+            <strong>Awards:</strong>{' '}
+            {education.awards.map((award) => `${award.title} (${award.year})`).join(', ')}
+          </p>
+        )}
+      </div>
+    </section>
+
+    {site.features.showCertifications && certifications.length > 0 && (
+      <section class="cv__section" aria-labelledby="cv-certifications">
+        <h2 id="cv-certifications">Certifications</h2>
+        <ul class="cv__plain">
+          {certifications.map((cert) => (
+            <li>
+              <strong>{cert.name}</strong>,{' '}
+              {isFilled(cert.issuerUrl) ? <a href={cert.issuerUrl}>{cert.issuer}</a> : cert.issuer},{' '}
+              {cert.date}
+              {isFilled(cert.reference) && <span> (ref. {cert.reference})</span>}
+              {isFilled(cert.url) && (
+                <>
+                  {' '}
+                  <a href={cert.url}>credential</a>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="cv__section" aria-labelledby="cv-languages">
+      <h2 id="cv-languages">Languages</h2>
+      <p>{site.languages.join(', ')}</p>
+    </section>
+
+    {site.features.showInterests && (
+      <section class="cv__section" aria-labelledby="cv-interests">
+        <h2 id="cv-interests">Interests</h2>
+        <p>{profile.interests.items.join(', ')}.</p>
+      </section>
+    )}
+  </article>
+</PrintLayout>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .cv-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .cv__header {
+    padding-bottom: var(--space-m);
+    border-bottom: 2px solid var(--text);
+  }
+
+  .cv__name {
+    margin-bottom: var(--space-3xs);
+    font-size: var(--step-4);
+  }
+
+  .cv__role {
+    margin-bottom: var(--space-xs);
+    font-size: var(--step-1);
+    color: var(--text-muted);
+  }
+
+  .cv__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2em 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--step--1);
+  }
+
+  .cv__contact li {
+    margin: 0;
+  }
+
+  .cv__contact li + li::before {
+    content: '·';
+    margin-inline: 0.6em;
+    color: var(--text-muted);
+  }
+
+  .cv__section {
+    padding-top: var(--space-m);
+  }
+
+  .cv__section h2 {
+    margin-bottom: var(--space-xs);
+    padding-bottom: var(--space-3xs);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--step-1);
+    letter-spacing: 0.02em;
+  }
+
+  .cv__skills {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .cv__skills dt {
+    font-weight: 600;
+  }
+
+  .cv__entry + .cv__entry {
+    margin-top: var(--space-m);
+  }
+
+  .cv__entry-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0 var(--space-s);
+  }
+
+  .cv__entry h3 {
+    margin: 0;
+    font-size: var(--step-0);
+  }
+
+  .cv__entry h3 a {
+    color: var(--text);
+  }
+
+  .cv__when {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cv__sub {
+    margin-bottom: var(--space-2xs);
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  .cv__stack {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .cv__plain {
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .cv__skills > div {
+      display: grid;
+      grid-template-columns: 11rem 1fr;
+      gap: var(--space-s);
+    }
+  }
+
+  @media print {
+    .cv {
+      font-size: 10pt;
+    }
+
+    .cv__name {
+      font-size: 22pt;
+    }
+
+    .cv__role {
+      font-size: 12pt;
+    }
+
+    .cv__header {
+      border-bottom-color: #000;
+    }
+
+    .cv__section {
+      padding-top: 10pt;
+    }
+
+    .cv__section h2 {
+      font-size: 12pt;
+      border-bottom-color: #999;
+    }
+
+    .cv__skills > div {
+      display: grid;
+      grid-template-columns: 34mm 1fr;
+      gap: 4mm;
+    }
+
+    .cv__entry {
+      break-inside: avoid;
+    }
+
+    .cv__entry + .cv__entry {
+      margin-top: 8pt;
+    }
+
+    .cv__entry h3 a {
+      text-decoration: none;
+    }
+
+    p {
+      margin-bottom: 4pt;
+    }
+  }
+</style>
