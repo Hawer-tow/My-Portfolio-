@@ -30,7 +30,8 @@ git remote add origin https://github.com/Hawer-tow/My-Portfolio-.git
 git branch -M main
 git push -u origin main
 
-
+git status 
+npm run verify
 
 
 

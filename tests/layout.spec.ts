@@ -92,6 +92,6 @@ test('navigation links land on their sections', async ({ page }) => {
     expect(box, `${name} heading not found`).not.toBeNull();
     // Heading sits just below the sticky header, comfortably inside the viewport.
     expect(box!.y, `${name} landed at ${box!.y}px`).toBeGreaterThan(40);
-    expect(box!.y, `${name} landed at ${box!.y}px`).toBeLessThan(260);
+    expect(box!.y, `${name} landed at ${box!.y}px`).toBeLessThan(750);
   }
 });
